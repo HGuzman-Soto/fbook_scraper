@@ -6,15 +6,16 @@ const selectors = {
   post: "div[data-ad-comet-preview='message']",
 };
 
+let feed = document.querySelector(selectors.feed);
+let observer = new MutationObserver(onMutation);
 // let timeout = null;
 
 function scrapeData() {
   if (window.location.href == "https://www.facebook.com/") {
     console.log("success");
-    let feed = document.querySelector(selectors.feed);
-    let observer = new MutationObserver(onMutation);
+
     onMutation();
-    watch(feed, observer);
+    watch();
   } else {
     console.log("failure");
   }
@@ -41,9 +42,7 @@ async function onMutation() {
   }
 }
 
-async function watch(feed, observer) {
-  console.log(feed);
-
+async function watch() {
   observer.observe(feed, {
     childList: true,
     subtree: true,
@@ -62,4 +61,5 @@ function comments(thread) {
   return sel(thread, selectors.text);
 }
 
+scrapeData();
 window.addEventListener("click", scrapeData);
