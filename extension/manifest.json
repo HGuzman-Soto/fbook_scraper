@@ -1,0 +1,29 @@
+{
+  "name": "Facebook Scraper",
+  "version": "1.0",
+  "description": "Parses facebook in the browser and stores data",
+  "manifest_version": 2,
+  "permissions": [
+    "activeTab",
+    "storage",
+    "unlimitedStorage",
+    "downloads",
+    "contextMenus"
+  ],
+  "background": { "persistent": false, "scripts": ["ext/cm.js"] },
+  "content_scripts": [
+    {
+      "matches": ["https://*.facebook.com/*"],
+      "css": [],
+      "js": [
+        "lib/md5.js",
+        "lib/db.js",
+        "lib/model/model.js",
+        "lib/model/thread.js",
+        "lib/util.js",
+        "ext/fb.js"
+      ]
+    }
+  ],
+  "options_page": "dist/index.html"
+}

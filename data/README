@@ -1,0 +1,2 @@
+1) Run organize data to unpack json object into post and comment csv file
+2) To update the data.csv, run 'python3 organize_data.py --a 1'
