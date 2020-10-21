@@ -19,6 +19,10 @@ button and continously clicking it
 3) Error checking -> make sure the contextMenu is click in the correct place
 
 
+The scraping will have two pass
+First, it will find the all comments bar and click it 
+Then, it will expand all the see more, replies, and view more comments buttons until none exist
+Finally, it will collect scrape all the comments
 
 */
 chrome.contextMenus.onClicked.addListener(function(clickData) {
@@ -37,12 +41,20 @@ chrome.contextMenus.onClicked.addListener(function(clickData) {
 //Function to handle the scraping and automatically scrolling
 function scrapePost() {
   const selectors = {
-    feed: "[role='feed']",
-    feed: "div[data-pagelet='root']",
+    first: "div[role='article]",
     thread: "div[data-testid='Keycommand_wrapper_feed_story']",
     comments: ".ecm0bbzt.e5nlhep0.a8c37x1j",
     text: ".kvgmc6g5.cxmmr5t8.oygrvhab.hcukyx3x.c1et5uql",
     post: "div[data-ad-comet-preview='message']",
   };
-  console.log(document.querySelector(selectors.feed));
+  console.log(document.querySelector(selectors.first));
+  console.log(document.querySelector(selectors.thread));
+  console.log(document.querySelector(selectors.post));
+  console.log(document.querySelector("p"));
+  // threads = sel(document, selectors.thread);
+  // console.log(threads.textContent);
+}
+
+function sel(em, sel) {
+  return Array.prototype.slice.call(em.querySelectorAll(sel));
 }
