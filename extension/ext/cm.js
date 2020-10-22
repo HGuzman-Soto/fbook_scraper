@@ -1,8 +1,10 @@
 //create right click menu
-chrome.contextMenus.create({
-  id: "scrapePost",
-  title: "Scrape this facebook post",
-  contexts: ["selection"],
+chrome.contextMenus.removeAll(function() {
+  chrome.contextMenus.create({
+    id: "scrapePost",
+    title: "Scrape this facebook post",
+    contexts: ["selection"],
+  });
 });
 
 /*
@@ -31,30 +33,17 @@ chrome.contextMenus.onClicked.addListener(function(clickData) {
     chrome.tabs.create({
       url: clickData.linkUrl,
     });
-    scrapePost();
     console.log("sucess");
+
+    //here we gotta find the tab of the window that it just opened
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        test: clickData.linkUrl,
+      });
+      console.log("testing");
+      console.log(tabs[0].id);
+    });
   } else {
     console.log("failure");
   }
 });
-
-//Function to handle the scraping and automatically scrolling
-function scrapePost() {
-  const selectors = {
-    first: "div[role='article]",
-    thread: "div[data-testid='Keycommand_wrapper_feed_story']",
-    comments: ".ecm0bbzt.e5nlhep0.a8c37x1j",
-    text: ".kvgmc6g5.cxmmr5t8.oygrvhab.hcukyx3x.c1et5uql",
-    post: "div[data-ad-comet-preview='message']",
-  };
-  console.log(document.querySelector(selectors.first));
-  console.log(document.querySelector(selectors.thread));
-  console.log(document.querySelector(selectors.post));
-  console.log(document.querySelector("p"));
-  // threads = sel(document, selectors.thread);
-  // console.log(threads.textContent);
-}
-
-function sel(em, sel) {
-  return Array.prototype.slice.call(em.querySelectorAll(sel));
-}

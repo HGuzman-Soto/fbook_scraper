@@ -4,6 +4,7 @@
   "description": "Parses facebook in the browser and stores data",
   "manifest_version": 2,
   "permissions": [
+    "tabs",
     "activeTab",
     "storage",
     "unlimitedStorage",
@@ -21,7 +22,8 @@
         "lib/model/model.js",
         "lib/model/thread.js",
         "lib/util.js",
-        "ext/fb.js"
+        "ext/fb.js",
+        "ext/scrape.js"
       ]
     }
   ],
