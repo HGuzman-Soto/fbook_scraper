@@ -1,6 +1,6 @@
 var contextMenuItem = {
-  id: "scrapePost",
-  title: "ScrapePost",
+  id: "spendMoney",
+  title: "SpendMoney",
   contexts: ["selection"],
 };
 
