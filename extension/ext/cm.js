@@ -33,11 +33,11 @@ chrome.contextMenus.onClicked.addListener(function(clickData) {
     chrome.tabs.create({
       url: clickData.linkUrl,
     });
-    console.log("sucess");
+    console.log("success");
 
     //here we gotta find the tab of the window that it just opened
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {
+      chrome.tabs.sendMessage(tabs[0].id + 1, {
         test: clickData.linkUrl,
       });
       console.log("testing");
