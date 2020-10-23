@@ -27,8 +27,6 @@ async function onMutation() {
 
   let threads, thread, post, cmts, doc;
 
-  console.log(sel(document, selectors.feed));
-
   threads = sel(document, selectors.thread);
 
   for (thread of threads) {
