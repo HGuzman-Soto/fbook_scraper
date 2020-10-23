@@ -13,6 +13,7 @@ Event listener for when contextMenu is clicked
 Assuming correct use-case which is when the contextMenu is clicked for a facebook
 post hour (clicking this will take you to a new page with the url of the exact post)
 
+
 1) Open a new tab and redirect to this new page
 2) Adapt the functions from fb.js to scrape this single post
 This entails modifying our css selectors and also coding functionality that makes 

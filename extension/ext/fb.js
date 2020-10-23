@@ -1,66 +1,66 @@
-// window.addEventListener("onpagehide", () => {
-//   console.log(window.location.href);
-//   if (window.location.href == "https://facebook.com") {
-//     console.log("success");
-//     main();
-//   }
-// });
+const selectors = {
+  feed: "[role='feed']",
+  // thread: ".cwj9ozl2.tvmbv18p",
+  thread: ".j83agx80.l9j0dhe7.k4urcfbm",
 
-window.addEventListener("load", () => {
-  const selectors = {
-    feed: "[role='feed']",
-    feed: "div[data-pagelet='root']",
-    thread: "div[data-testid='Keycommand_wrapper_feed_story']",
-    comments: ".ecm0bbzt.e5nlhep0.a8c37x1j",
-    text: ".kvgmc6g5.cxmmr5t8.oygrvhab.hcukyx3x.c1et5uql",
-    post: "div[data-ad-comet-preview='message']",
-  };
-  let timeout = null;
-  let observer = new MutationObserver(onMutation);
-  let feed = document.querySelector(selectors.feed);
+  comments: ".ecm0bbzt.e5nlhep0.a8c37x1j",
+  text: ".kvgmc6g5.cxmmr5t8.oygrvhab.hcukyx3x.c1et5uql",
+  post: "div[data-ad-comet-preview='message']",
+};
 
-  onMutation();
-  watch();
+// let timeout = null;
 
-  async function onMutation() {
-    console.log("Handling mutation.");
+function scrapeData() {
+  if (window.location.href == "https://www.facebook.com/") {
+    console.log("success");
+    let feed = document.querySelector(selectors.feed);
+    let observer = new MutationObserver(onMutation);
+    onMutation();
+    watch(feed, observer);
+  } else {
+    console.log("failure");
+  }
+}
 
-    let threads, thread, post, cmts, doc;
+async function onMutation() {
+  console.log("Handling mutation.");
 
-    threads = sel(document, selectors.thread);
+  let threads, thread, post, cmts, doc;
 
-    for (thread of threads) {
-      doc = new Thread();
-      post = posts(thread);
+  threads = sel(document, selectors.thread);
 
-      cmts = sel(thread, selectors.comments);
-      post.map((em) => doc.post.push(em.textContent));
-      cmts.map((em) => doc.comments.push(em.textContent));
+  for (thread of threads) {
+    doc = new Thread();
+    post = posts(thread);
 
-      if (doc.comments.length) {
-        await doc.save();
-      }
+    cmts = sel(thread, selectors.comments);
+    post.map((em) => doc.post.push(em.textContent));
+    cmts.map((em) => doc.comments.push(em.textContent));
+
+    if (doc.comments.length) {
+      await doc.save();
     }
   }
+}
 
-  async function watch() {
-    observer.observe(feed, {
-      childList: true,
-      subtree: true,
-    });
-  }
+async function watch(feed, observer) {
+  observer.observe(feed, {
+    childList: true,
+    subtree: true,
+  });
+}
 
-  function pause() {
-    observer.disconnect();
-  }
+function pause() {
+  observer.disconnect();
+}
 
-  function posts(thread) {
-    return sel(thread, selectors.post);
-  }
+function posts(thread) {
+  return sel(thread, selectors.post);
+}
 
-  function comments(thread) {
-    return sel(thread, selectors.text);
-  }
-});
+function comments(thread) {
+  return sel(thread, selectors.text);
+}
 
-// main();
+scrapeData();
+window.addEventListener("click", scrapeData);
