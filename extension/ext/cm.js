@@ -31,14 +31,9 @@ Finally, it will collect scrape all the comments
 
 chrome.contextMenus.onClicked.addListener(function(clickData) {
   if (clickData.menuItemId == "scrapePost") {
-    chrome.tabs.create(
-      {
-        url: clickData.linkUrl,
-      },
-      function(newtab) {
-        console.log(newtab.id);
-      }
-    );
+    chrome.tabs.create({
+      url: clickData.linkUrl,
+    });
     chrome.tabs.executeScript({ file: "ext/scrape.js" });
   }
 });

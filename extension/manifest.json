@@ -10,7 +10,6 @@
     "unlimitedStorage",
     "downloads",
     "contextMenus",
-    "http://*/",
     "https://*/"
   ],
   "background": { "persistent": false, "scripts": ["ext/cm.js"] },
