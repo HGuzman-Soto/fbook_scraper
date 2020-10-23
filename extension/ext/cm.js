@@ -28,23 +28,17 @@ Then, it will expand all the see more, replies, and view more comments buttons u
 Finally, it will collect scrape all the comments
 
 */
+
 chrome.contextMenus.onClicked.addListener(function(clickData) {
   if (clickData.menuItemId == "scrapePost") {
-    console.log(clickData.linkUrl);
-    chrome.tabs.create({
-      url: clickData.linkUrl,
-    });
-    console.log("success");
-
-    //here we gotta find the tab of the window that it just opened
-    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id + 1, {
-        test: clickData.linkUrl,
-      });
-      console.log("testing");
-      console.log(tabs[0].id);
-    });
-  } else {
-    console.log("failure");
+    chrome.tabs.create(
+      {
+        url: clickData.linkUrl,
+      },
+      function(newtab) {
+        console.log(newtab.id);
+      }
+    );
+    chrome.tabs.executeScript({ file: "ext/scrape.js" });
   }
 });

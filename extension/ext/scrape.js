@@ -1,7 +1,3 @@
-chrome.runtime.onMessage.addListener(function(msg) {
-  console.log(msg);
-});
-
 //Function to handle the scraping and automatically scrolling
 function scrapePost() {
   console.log(document);
@@ -27,3 +23,5 @@ function scrapePost() {
 function sel(em, sel) {
   return Array.prototype.slice.call(em.querySelectorAll(sel));
 }
+
+scrapePost();
