@@ -1,3 +1,16 @@
+//Comment expansion function
+function TriggerSingleLink(links, index) {
+    if (index >= links.length) {
+        console.log("All done.");
+        return;
+    }
+    var oLink = links[index];
+    oLink.trigger('click');
+    window.setTimeout(function() {
+        TriggerSingleLink(links, index + 1)
+    }, 500);
+}
+
 //Function to handle the scraping and automatically scrolling
 function scrapePost() {
   console.log(document);
@@ -27,6 +40,19 @@ function scrapePost() {
   function sel(em, sel) {
     return Array.prototype.slice.call(em.querySelectorAll(sel));
   }
+}
+//Comment expansion before scraping posts (not tested AT ALL)
+var links = [];
+$('.js-show-link').each(function() {
+    var oLink = $(this);
+    if ($.trim(oLink.text()).length > 0)
+        links.push(oLink);
+});
+if (links.length > 0) {
+    console.log("Expanding " + links.length + " link" + ((links.length > 1) ? "s" : "") +"...");
+    TriggerSingleLink(links, 0);
+} else {
+    console.log("No valid expand links found.");
 }
 
 scrapePost();
