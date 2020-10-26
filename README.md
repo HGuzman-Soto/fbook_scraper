@@ -1,6 +1,6 @@
-#Facebook Scraper 
+# Facebook Scraper 
 
-A chrome extension that automatically collects posts and comments in the browser and additional scripts to organize data. Developed as a part of Dr. Yudong Liu research lab. 
+A chrome extension that automatically collects posts and comments in the browser and additional scripts to organize data. Developed as a part of Dr. Yudong Liu research lab. Currently a work in progress
 
 ## Features
 * Scrapes all post and comments on the home page as the user scrolls through their facebook.
@@ -17,3 +17,8 @@ A chrome extension that automatically collects posts and comments in the browser
 4. Click the "Developer mode" button top right
 5. Click "Load unpacked"
 6. Select the extracted folder
+
+### Maintainers
+
+Hansel Guzman-Soto (soto26938@gmail.com)
+Hannah Buzard (buzardh@wwu.edu)
