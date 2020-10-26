@@ -20,5 +20,5 @@ A chrome extension that automatically collects posts and comments in the browser
 
 ### Maintainers
 
-Hansel Guzman-Soto (soto26938@gmail.com)
+Hansel Guzman-Soto (soto26938@gmail.com)\
 Hannah Buzard (buzardh@wwu.edu)
