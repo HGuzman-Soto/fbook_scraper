@@ -7,33 +7,27 @@ chrome.contextMenus.removeAll(function() {
   });
 });
 
-/*
-Event listener for when contextMenu is clicked
-
-Assuming correct use-case which is when the contextMenu is clicked for a facebook
-post hour (clicking this will take you to a new page with the url of the exact post)
-
-
-1) Open a new tab and redirect to this new page
-2) Adapt the functions from fb.js to scrape this single post
-This entails modifying our css selectors and also coding functionality that makes 
-the browser automatically collect all the post. This would be done, by finding the more comments
-button and continously clicking it
-3) Error checking -> make sure the contextMenu is click in the correct place
-
-
-The scraping will have two pass
-First, it will find the all comments bar and click it 
-Then, it will expand all the see more, replies, and view more comments buttons until none exist
-Finally, it will collect scrape all the comments
-
-*/
-
 chrome.contextMenus.onClicked.addListener(function(clickData) {
   if (clickData.menuItemId == "scrapePost") {
     chrome.tabs.create({
       url: clickData.linkUrl,
     });
-    chrome.tabs.executeScript({ file: "ext/scrape.js" });
+
+    //delay excuation of bookmarkelet, either timer or some reload stuff  - todo - 3 seconds
+
+    function process(callback) {
+      setTimeout(delay_script, 3000);
+      callback();
+    }
+
+    process(scrapePost());
   }
 });
+
+function delay_script() {
+  chrome.tabs.executeScript({ file: "ext/expandAll.js" });
+}
+
+function scrapePost() {
+  chrome.tabs.executeScript({ file: "ext/expandAll.js" });
+}

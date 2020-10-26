@@ -8,8 +8,6 @@ const selectors = {
   post: "div[data-ad-comet-preview='message']",
 };
 
-// let timeout = null;
-
 function scrapeData() {
   if (window.location.href == "https://www.facebook.com/") {
     console.log("success");
