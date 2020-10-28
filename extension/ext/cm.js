@@ -19,22 +19,38 @@ chrome.contextMenus.onClicked.addListener(function(clickData) {
       url: clickData.linkUrl,
     });
 
-    function timeout(ms) {
-      return new Promise((res) => setTimeout(res, ms));
+    // function timeout(ms) {
+    //   return new Promise((res) => setTimeout(res, ms));
+    // }
+
+    // async function fireEvents() {
+    //   await timeout(7000);
+    //   delay_script();
+    //   await timeout(7000);
+    //   scrapePost();
+    // }
+    // fireEvents();
+
+    function first() {
+      return new Promise(function(resolve, reject) {
+        setTimeout(function() {
+          let test = delay_script();
+          console.log(test);
+          resolve("Stuff worked!");
+        }, 7000);
+      });
     }
 
-    async function fireEvents() {
-      await timeout(7000);
-      delay_script();
-      await timeout(7000);
+    first().then(function() {
       scrapePost();
-    }
-    fireEvents();
+    });
   }
 });
 
 function delay_script() {
-  chrome.tabs.executeScript({ file: "ext/expandAll.js" });
+  let execute = chrome.tabs.executeScript({ file: "ext/expandAll.js" });
+  console.log("finsihed this script");
+  return execute;
 }
 
 function scrapePost() {

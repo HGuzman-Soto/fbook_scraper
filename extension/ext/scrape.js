@@ -11,6 +11,7 @@ function scrapePost() {
     post_text: "div[data-ad-comet-preview='message']",
     comments: ".ecm0bbzt.e5nlhep0.a8c37x1j",
   };
+  console.log("scraping new tab");
   let post, cmts, doc;
 
   main = document.querySelector(selectors.post);
@@ -22,12 +23,10 @@ function scrapePost() {
   post.map((em) => doc.post.push(em.textContent));
   cmts.map((em) => doc.comments.push(em.textContent));
 
-  console.log(post);
-  console.log(cmts);
-
   if (doc.comments.length) {
     doc.save();
   }
+  console.log("finished");
 
   function sel(em, sel) {
     return Array.prototype.slice.call(em.querySelectorAll(sel));
