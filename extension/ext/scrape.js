@@ -8,16 +8,36 @@ Runs after cm.js is called and expandAll.js finishes running
 function scrapePost() {
   const selectors = {
     post: '[aria-posinset][role="article"]',
-    feed: "div[data-pagelet='root']",
-    thread: ".bp9cbjyn.j83agx80.cbu4d94t.d2edcug0",
-    comments: "._3w53,._6iiv,._7a9a",
+    post_text: "div[data-ad-comet-preview='message']",
+    comments: ".ecm0bbzt.e5nlhep0.a8c37x1j",
   };
+  let post, cmts, doc;
 
-  console.log(document.querySelector(selectors.post));
-  console.log(document.querySelector(selectors.comments));
+  main = document.querySelector(selectors.post);
+
+  doc = new Thread();
+  post = posts(main);
+
+  cmts = sel(main, selectors.comments);
+  post.map((em) => doc.post.push(em.textContent));
+  cmts.map((em) => doc.comments.push(em.textContent));
+
+  console.log(post);
+  console.log(cmts);
+
+  if (doc.comments.length) {
+    doc.save();
+  }
 
   function sel(em, sel) {
     return Array.prototype.slice.call(em.querySelectorAll(sel));
+  }
+  function posts(thread) {
+    return sel(thread, selectors.post_text);
+  }
+
+  function comments(thread) {
+    return sel(thread, selectors.comments);
   }
 }
 
