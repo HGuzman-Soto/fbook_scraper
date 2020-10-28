@@ -1,4 +1,10 @@
-//create right click menu
+/*
+
+Create the contextMenu which creates a new tab and calls scrape.js 
+which scrapes the entire comments of that page
+
+*/
+
 chrome.contextMenus.removeAll(function() {
   chrome.contextMenus.create({
     id: "scrapePost",
@@ -13,14 +19,17 @@ chrome.contextMenus.onClicked.addListener(function(clickData) {
       url: clickData.linkUrl,
     });
 
-    //delay excuation of bookmarkelet, either timer or some reload stuff  - todo - 3 seconds
-
-    function process(callback) {
-      setTimeout(delay_script, 3000);
-      callback();
+    function timeout(ms) {
+      return new Promise((res) => setTimeout(res, ms));
     }
 
-    process(scrapePost());
+    async function fireEvents() {
+      await timeout(7000);
+      delay_script();
+      await timeout(7000);
+      scrapePost();
+    }
+    fireEvents();
   }
 });
 
@@ -29,5 +38,6 @@ function delay_script() {
 }
 
 function scrapePost() {
-  chrome.tabs.executeScript({ file: "ext/expandAll.js" });
+  console.log("called scrape ");
+  chrome.tabs.executeScript({ file: "ext/scrape.js" });
 }

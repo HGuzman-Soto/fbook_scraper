@@ -1,8 +1,13 @@
+/*
+
+Script automatically runs in the facebook home page and collects seeable data
+This only runs in on the home page.
+
+*/
+
 const selectors = {
   feed: "[role='feed']",
-  // thread: ".cwj9ozl2.tvmbv18p",
   thread: ".j83agx80.l9j0dhe7.k4urcfbm",
-
   comments: ".ecm0bbzt.e5nlhep0.a8c37x1j",
   text: ".kvgmc6g5.cxmmr5t8.oygrvhab.hcukyx3x.c1et5uql",
   post: "div[data-ad-comet-preview='message']",
