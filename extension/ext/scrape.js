@@ -1,29 +1,55 @@
-chrome.runtime.onMessage.addListener(function(msg) {
-  console.log(msg);
-});
+/*
 
-//Function to handle the scraping and automatically scrolling
+Finds the comments area of the new tab and scrapes the entire page.
+Runs after cm.js is called and expandAll.js finishes running
+
+*/
+
 function scrapePost() {
-  console.log(document);
   const selectors = {
-    // first: "div[role='article]",
-    test: "div[role='main']",
-    first: ".cwj9ozl2.tvmbv18p",
-    thread: "div[data-testid='Keycommand_wrapper_feed_story']",
+    post: '[aria-posinset][role="article"]',
+    post_text: "div[data-ad-comet-preview='message']",
     comments: ".ecm0bbzt.e5nlhep0.a8c37x1j",
-    text: ".kvgmc6g5.cxmmr5t8.oygrvhab.hcukyx3x.c1et5uql",
-    post: "div[data-ad-comet-preview='message']",
   };
-  console.log(this.document.querySelector(selectors.first));
-  console.log(document.querySelector(selectors.thread));
-  console.log(this.document.querySelector(selectors.test));
+  console.log("scraping new tab");
+  let post, cmts, doc;
 
-  console.log(document.querySelector(selectors.post));
-  console.log(document.querySelector("p"));
-  // threads = sel(document, selectors.thread);
-  // console.log(threads.textContent);
+  main = document.querySelector(selectors.post);
+  let observer = new MutationObserver(onMutation);
+  onMutation();
+  watch(main, observer);
+
+  async function onMutation() {
+    console.log("Handling mutation.");
+    doc = new Thread();
+    post = posts(main);
+
+    cmts = sel(main, selectors.comments);
+    post.map((em) => doc.post.push(em.textContent));
+    cmts.map((em) => doc.comments.push(em.textContent));
+
+    if (doc.comments.length) {
+      doc.save();
+    }
+
+    function sel(em, sel) {
+      return Array.prototype.slice.call(em.querySelectorAll(sel));
+    }
+    function posts(thread) {
+      return sel(thread, selectors.post_text);
+    }
+
+    function comments(thread) {
+      return sel(thread, selectors.comments);
+    }
+  }
+
+  async function watch(main, observer) {
+    observer.observe(main, {
+      childList: true,
+      subtree: true,
+    });
+  }
 }
 
-function sel(em, sel) {
-  return Array.prototype.slice.call(em.querySelectorAll(sel));
-}
+scrapePost();
