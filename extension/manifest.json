@@ -10,7 +10,8 @@
     "unlimitedStorage",
     "downloads",
     "contextMenus",
-    "https://*/"
+    "https://*/",
+    "webNavigation"
   ],
   "background": { "persistent": false, "scripts": ["ext/cm.js"] },
   "content_scripts": [

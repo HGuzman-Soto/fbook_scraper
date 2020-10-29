@@ -15,28 +15,40 @@ function scrapePost() {
   let post, cmts, doc;
 
   main = document.querySelector(selectors.post);
+  let observer = new MutationObserver(onMutation);
+  onMutation();
+  watch(main, observer);
 
-  doc = new Thread();
-  post = posts(main);
+  async function onMutation() {
+    console.log("Handling mutation.");
+    doc = new Thread();
+    post = posts(main);
 
-  cmts = sel(main, selectors.comments);
-  post.map((em) => doc.post.push(em.textContent));
-  cmts.map((em) => doc.comments.push(em.textContent));
+    cmts = sel(main, selectors.comments);
+    post.map((em) => doc.post.push(em.textContent));
+    cmts.map((em) => doc.comments.push(em.textContent));
 
-  if (doc.comments.length) {
-    doc.save();
+    if (doc.comments.length) {
+      doc.save();
+    }
+
+    function sel(em, sel) {
+      return Array.prototype.slice.call(em.querySelectorAll(sel));
+    }
+    function posts(thread) {
+      return sel(thread, selectors.post_text);
+    }
+
+    function comments(thread) {
+      return sel(thread, selectors.comments);
+    }
   }
-  console.log("finished");
 
-  function sel(em, sel) {
-    return Array.prototype.slice.call(em.querySelectorAll(sel));
-  }
-  function posts(thread) {
-    return sel(thread, selectors.post_text);
-  }
-
-  function comments(thread) {
-    return sel(thread, selectors.comments);
+  async function watch(main, observer) {
+    observer.observe(main, {
+      childList: true,
+      subtree: true,
+    });
   }
 }
 

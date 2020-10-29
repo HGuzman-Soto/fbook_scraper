@@ -1,8 +1,6 @@
 /*
-
 Create the contextMenu which creates a new tab and calls scrape.js 
 which scrapes the entire comments of that page
-
 */
 
 chrome.contextMenus.removeAll(function() {
@@ -18,42 +16,19 @@ chrome.contextMenus.onClicked.addListener(function(clickData) {
     chrome.tabs.create({
       url: clickData.linkUrl,
     });
+    setTimeout(function() {
+      delay_script();
+    }, 6000);
+  }
 
-    // function timeout(ms) {
-    //   return new Promise((res) => setTimeout(res, ms));
-    // }
-
-    // async function fireEvents() {
-    //   await timeout(7000);
-    //   delay_script();
-    //   await timeout(7000);
-    //   scrapePost();
-    // }
-    // fireEvents();
-
-    function first() {
-      return new Promise(function(resolve, reject) {
-        setTimeout(function() {
-          let test = delay_script();
-          console.log(test);
-          resolve("Stuff worked!");
-        }, 7000);
-      });
-    }
-
-    first().then(function() {
-      scrapePost();
+  function delay_script() {
+    chrome.tabs.executeScript(null, { file: "ext/expandAll.js" }, function() {
+      chrome.tabs.executeScript(null, { file: "ext/scrape.js" });
     });
   }
+
+  // function scrapePost() {
+  //   console.log("run");
+  //   chrome.tabs.executeScript({ file: "ext/scrape.js" });
+  // }
 });
-
-function delay_script() {
-  let execute = chrome.tabs.executeScript({ file: "ext/expandAll.js" });
-  console.log("finsihed this script");
-  return execute;
-}
-
-function scrapePost() {
-  console.log("called scrape ");
-  chrome.tabs.executeScript({ file: "ext/scrape.js" });
-}
