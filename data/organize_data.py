@@ -1,5 +1,6 @@
 """
 Script takes json objects from chrome extension and organizes the data into a csv files
+
 """
 
 import json
@@ -18,6 +19,7 @@ from pathlib import Path
 """
 To add to existing json file, use the argument --a 1
 To retrieve json file, use the argument --j 1
+
 """
 
 
@@ -77,13 +79,14 @@ def main(add):
         df['post'][row] = " ".join(dict_post)
 
     df.drop(columns=['threads'], axis=1, inplace=True)
-    df.index = df['post'].str.len()
-    df = df.sort_index(ascending=False).reset_index(drop=True)
-    df.drop_duplicates(subset=['post'], keep='first',
+    df.drop_duplicates(subset=['post'], keep='last',
                        inplace=True, ignore_index=True)
 
-    if path.exists('data.csv') and add == 1:
+    if path.exists('data.csv') :
         df.to_csv('data.csv', mode='a', header=False, index=False)
+        newdf = pd.read_csv('data.csv')
+        newdf.drop_duplicates(subset=['post'], keep='first',inplace=True, ignore_index=True)
+        newdf.to_csv('data.csv', index=False)
     else:
         df.to_csv('data.csv', index=False)
 
@@ -101,4 +104,5 @@ if __name__ == "__main__":
         find_jsonfile()
 
     main(args.add)
+
 
