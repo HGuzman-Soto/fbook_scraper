@@ -45,7 +45,6 @@ def find_jsonfile():
 
                 # # copies file to target folder
                 current_digit = re.findall(r'\d+', name)
-                print(current_digit)
 
                 # check that a digit exists - else turn to int
                 if not current_digit:
@@ -71,21 +70,44 @@ def main(add):
 
     df['post'] = ""
     df['comments'] = ""
+    df['post id'] = ""
+    totalrows = 0
+    totalcomments = []         #lists containing all comment threads, all post ids and all posts
+    totalids = []
+    totalposts = []
     for row in range(len(df)):
+        dict_id = df['threads'][row]['id']
+        totalids.append(dict_id)
         dict_comments = df['threads'][row]['comments']
+        totalcomments.append(dict_comments)
         dict_post = df['threads'][row]['post']
-
-        df['comments'][row] = " ".join(dict_comments)
-        df['post'][row] = " ".join(dict_post)
-
+        totalposts.append(dict_post)
+    
+    iterator = 0                             #variables for adding to the dataframe 
+    rownum = 0
+    for i in range (0, len(totalposts)) :    #needed this because if post is an image, the array will be empty, which throws an error
+        if len(totalposts[i]) == 0 :
+            totalposts[i] = ''
+            
+    for comment in totalcomments :           #make each comment its own row in the dataframe and add the necessary information to that row
+        commentnum = 0
+        for comm in comment :
+            if commentnum == 0 :             #gets rid of duplicating the text of the posts
+                addpost = totalposts[iterator]
+            else :
+                addpost = ''
+            df1 = pd.DataFrame({'post': addpost, 'comments': comm, 'post id': totalids[iterator]} , index= [rownum])
+            result = df.append(df1)           #append new row to the dataframe
+            df = result.copy()
+            rownum = rownum + 1
+            commentnum = commentnum + 1
+        iterator = iterator + 1
+    df.drop_duplicates(subset=['comments'], keep='last', inplace=True, ignore_index=True) #drop duplicate comments
     df.drop(columns=['threads'], axis=1, inplace=True)
-    df.drop_duplicates(subset=['post'], keep='last',
-                       inplace=True, ignore_index=True)
-
     if path.exists('data.csv') :
         df.to_csv('data.csv', mode='a', header=False, index=False)
-        newdf = pd.read_csv('data.csv')
-        newdf.drop_duplicates(subset=['post'], keep='first',inplace=True, ignore_index=True)
+        newdf = pd.read_csv('data.csv')                                   #ensures that duplicate comments are dropped from csv
+        newdf.drop_duplicates(subset=['comments'], keep='first',inplace=True, ignore_index=True)   
         newdf.to_csv('data.csv', index=False)
     else:
         df.to_csv('data.csv', index=False)
