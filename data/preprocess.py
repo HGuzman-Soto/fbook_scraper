@@ -5,6 +5,7 @@ Scripts cleans up social media text
 from contractions import CONTRACTION_MAP  # from contractions.py
 import pandas as pd
 import re
+import math
 import nltk
 from nltk.corpus import stopwords
 from nltk import word_tokenize
@@ -35,10 +36,15 @@ Potential issues
 that are needed to convey information such as a guzman-soto or 8.15
 This might be a potential issue
 
+3) Skip blank lines?
+
 """
 
 
 def clean(text):
+    # check if empty (nan)
+    if text != text:
+        return text
 
     # remove see more
     text = re.sub(r' ?\w*?[…]see more.', '', text, flags=re.I)
