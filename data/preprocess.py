@@ -41,8 +41,7 @@ def clean(text):
     text = expand_contractions(text)
 
     # remove special characters
-    text = remove_special_characters(text
-                                     )
+    text = remove_special_characters(text)
 
     # remove extra newlines
     text = re.sub(r'[\r|\n|\r\n]+', ' ', text)
