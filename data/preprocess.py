@@ -7,6 +7,24 @@ import pandas as pd
 import re
 import nltk
 from nltk.corpus import stopwords
+from nltk import word_tokenize
+from nltk import StanfordTagger
+
+
+# TODO -
+# 1) Make it run in O(n) instead of O(n^2)
+# 2) Edge cases --> VBP for instances and so on
+# 3) Maybe add its index?
+# 4) Transition to using Stanford Tagger later on
+def extract_content_words(text):
+    content_words = []
+
+    text_tokenize = nltk.word_tokenize(text)
+    text_tagged = nltk.pos_tag(text_tokenize)
+    for word, word_class in text_tagged:
+        if (word_class == 'NN' or word_class == 'JJ' or word_class == 'RB' or word_class == 'VB'):
+            content_words.append(word)
+    return content_words
 
 
 # Split attached words from https://www.analyticsvidhya.com/blog/2014/11/text-data-cleaning-steps-python/
