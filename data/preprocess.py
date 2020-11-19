@@ -7,21 +7,43 @@ import pandas as pd
 import re
 import math
 import nltk
+import spacy
 from nltk.corpus import stopwords
 from nltk import word_tokenize
 from nltk import StanfordTagger
 
+# relook at documentation, also this method is slow as shit right now
 
-# TODO -
+
+def remove_entities(text):
+    text_no_entities = []
+    nlp = spacy.load("en_core_web_sm")
+    doc = nlp(text)
+    ents = [e.text for e in doc.ents]
+
+    for item in doc:
+        if item.text in ents:
+            pass
+        else:
+            text_no_entities.append(item.text)
+    print(" ".join(text_no_entities))
+    return text_no_entities
+
+# TODO - below
 # 1) Make it run in O(n) instead of O(n^2)
 # 2) Edge cases --> VBP for instances and so on
 # 3) Maybe add its index?
 # 4) Transition to using Stanford Tagger later on
+
+
 def extract_content_words(text):
+    if text != text:
+        return text
     content_words = []
 
-    text_tokenize = nltk.word_tokenize(text)
-    text_tagged = nltk.pos_tag(text_tokenize)
+    # text_tokenize = nltk.word_tokenize(text)
+    # text_tagged = nltk.pos_tag(text_tokenize)
+    text_tagged = nltk.pos_tag(text)
     for word, word_class in text_tagged:
         if (word_class == 'NN' or word_class == 'JJ' or word_class == 'RB' or word_class == 'VB'):
             content_words.append(word)
@@ -42,7 +64,7 @@ This might be a potential issue
 
 
 def clean(text):
-    # check if empty (nan)
+    # check if empty (nan) ---> issue??
     if text != text:
         return text
 
