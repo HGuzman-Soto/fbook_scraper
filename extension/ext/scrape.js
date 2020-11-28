@@ -1,3 +1,4 @@
+
 /*
 
 Finds the comments area of the new tab and scrapes the entire page.
@@ -29,6 +30,8 @@ function scrapePost() {
     cmts.map((em) => doc.comments.push(em.textContent));
 
     if (doc.comments.length) {
+      var commSize = doc.comments.length;
+      localStorage.setItem("commLength", commSize);  
       doc.save();
     }
 
@@ -43,7 +46,6 @@ function scrapePost() {
       return sel(thread, selectors.comments);
     }
   }
-
   async function watch(main, observer) {
     observer.observe(main, {
       childList: true,
@@ -51,5 +53,4 @@ function scrapePost() {
     });
   }
 }
-
 scrapePost();
