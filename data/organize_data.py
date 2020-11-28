@@ -69,45 +69,52 @@ def main(add):
     df = pd.read_json(json_file, orient='DataFrame')
 
     df['post'] = ""
-    df['comments'] = ""
+    df['text'] = ""
     df['post id'] = ""
+    df['comment id'] = ""
+
     totalrows = 0
     totalcomments = []         #lists containing all comment threads, all post ids and all posts
     totalids = []
+    totalcommid = []
     totalposts = []
     for row in range(len(df)):
         dict_id = df['threads'][row]['id']
         totalids.append(dict_id)
+        dict_commentid = df['threads'][row]['commentid']
+        totalcommid.append(dict_commentid)
         dict_comments = df['threads'][row]['comments']
         totalcomments.append(dict_comments)
         dict_post = df['threads'][row]['post']
         totalposts.append(dict_post)
-    
-    iterator = 0                             #variables for adding to the dataframe 
+
+    iterator = 0                             #variables for adding to the dataframe
     rownum = 0
     for i in range (0, len(totalposts)) :    #needed this because if post is an image, the array will be empty, which throws an error
         if len(totalposts[i]) == 0 :
             totalposts[i] = ''
-            
-    for comment in totalcomments :           #make each comment its own row in the dataframe and add the necessary information to that row
+
+    for comment in totalcomments :          #make each comment its own row in the dataframe and add the necessary information to that row
+        addpost = totalposts[iterator]
+        df2 = pd.DataFrame({'post': 0, 'text': addpost, 'post id': totalids[iterator], 'comment id': 0} , index= [rownum])
+        result2 = df.append(df2)           #append new row to the dataframe
+        df = result2.copy()
         commentnum = 0
         for comm in comment :
-            if commentnum == 0 :             #gets rid of duplicating the text of the posts
-                addpost = totalposts[iterator]
-            else :
-                addpost = ''
-            df1 = pd.DataFrame({'post': addpost, 'comments': comm, 'post id': totalids[iterator]} , index= [rownum])
+            df1 = pd.DataFrame({'post': 0, 'text': comm, 'post id': totalids[iterator], 'comment id': totalcommid[iterator][commentnum]} , index= [rownum])
             result = df.append(df1)           #append new row to the dataframe
             df = result.copy()
             rownum = rownum + 1
             commentnum = commentnum + 1
         iterator = iterator + 1
-    df.drop_duplicates(subset=['comments'], keep='last', inplace=True, ignore_index=True) #drop duplicate comments
+
+    df.drop_duplicates(subset=['text'], keep='last', inplace=True, ignore_index=True) #drop duplicate comments
     df.drop(columns=['threads'], axis=1, inplace=True)
+    df.drop(columns=['post'], axis=1, inplace=True)
     if path.exists('data.csv') :
         df.to_csv('data.csv', mode='a', header=False, index=False)
         newdf = pd.read_csv('data.csv')                                   #ensures that duplicate comments are dropped from csv
-        newdf.drop_duplicates(subset=['comments'], keep='first',inplace=True, ignore_index=True)   
+        newdf.drop_duplicates(subset=['text'], keep='first',inplace=True, ignore_index=True)
         newdf.to_csv('data.csv', index=False)
     else:
         df.to_csv('data.csv', index=False)
@@ -126,5 +133,6 @@ if __name__ == "__main__":
         find_jsonfile()
 
     main(args.add)
+
 
 
