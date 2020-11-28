@@ -1,3 +1,4 @@
+
 /*
 
 Script automatically runs in the facebook home page and collects seeable data
@@ -41,6 +42,8 @@ async function onMutation() {
     cmts.map((em) => doc.comments.push(em.textContent));
 
     if (doc.comments.length) {
+      var commSize = doc.comments.length;
+      localStorage.setItem("commLength", commSize);
       await doc.save();
     }
   }

@@ -1,3 +1,4 @@
+
 /*
 
 1) Finds the comments area of the new tab and scrapes the entire page.
@@ -38,6 +39,8 @@ function scrapePost(upperBound) {
     cmts.map((em) => doc.comments.push(em.textContent));
 
     if (doc.comments.length) {
+      var commSize = doc.comments.length;
+      localStorage.setItem("commLength", commSize);  
       doc.save();
     }
 
@@ -52,7 +55,6 @@ function scrapePost(upperBound) {
       return sel(thread, selectors.comments);
     }
   }
-
   async function watch(main, observer) {
     observer.observe(main, {
       childList: true,
@@ -94,9 +96,6 @@ if (num_of_comments > 50) {
   console.log("time:", lowerBound/1000, "seconds")
 
 }
-
-
-
 
 upperBound = 2000
 setTimeout(function () { scrapePost(upperBound) }, lowerBound)
