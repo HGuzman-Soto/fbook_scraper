@@ -12,7 +12,7 @@ from nltk.corpus import stopwords
 from nltk import word_tokenize
 from nltk import StanfordTagger
 
-# relook at documentation, also this method is slow as shit right now
+# relook at documentation, also this method is slow
 
 
 def remove_entities(text):
