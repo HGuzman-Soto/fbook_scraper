@@ -10,7 +10,7 @@ import nltk
 import spacy
 from nltk.corpus import stopwords
 from nltk import word_tokenize
-from nltk import StanfordTagger
+
 
 # relook at documentation, also this method is slow
 
@@ -37,16 +37,25 @@ def remove_entities(text):
 
 
 def extract_content_words(text):
-    if text != text:
-        return text
-    content_words = []
+    nlp = spacy.load("en_core_web_sm")
+    doc = nlp(text)
 
-    # text_tokenize = nltk.word_tokenize(text)
-    # text_tagged = nltk.pos_tag(text_tokenize)
-    text_tagged = nltk.pos_tag(text)
-    for word, word_class in text_tagged:
-        if (word_class == 'NN' or word_class == 'JJ' or word_class == 'RB' or word_class == 'VB'):
-            content_words.append(word)
+    content_words = []
+    for token in doc:
+        token_class = token.pos_
+        if (token_class == 'NOUN' or token_class == 'VERB' or token_class == 'ADV' or token_class == 'ADJ'):
+            content_words.append(token)
+            # if text != text:
+            #     return text
+            # content_words = []
+
+            # # text_tokenize = nltk.word_tokenize(text)
+            # # text_tagged = nltk.pos_tag(text_tokenize)
+            # text_tagged = nltk.pos_tag(text)
+            # for word, word_class in text_tagged:
+            #     if (word_class == 'NN' or word_class == 'JJ' or word_class == 'RB' or word_class == 'VB'):
+            #         content_words.append(word)
+    print(content_words)
     return content_words
 
 
