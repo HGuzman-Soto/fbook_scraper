@@ -1007,12 +1007,12 @@ javascript: (function() {
     }
     static trulyEnd() {
       if (Global.cfg) {
-        // Global.cfg.hide();
+        Global.cfg.hide();
         delete Global.cfg;
       }
       Global.escHandler.off();
       Global.cfgHandler.off();
-      // Global.logger.hide();
+      Global.logger.hide();
       delete window.Global;
       Global = null;
     }

@@ -18,7 +18,7 @@ chrome.contextMenus.onClicked.addListener(function(clickData) {
     });
     setTimeout(function() {
       delay_script();
-    }, 6000);
+    }, 8000);
   }
 
   function delay_script() {
