@@ -63,7 +63,7 @@ def find_jsonfile():
     shutil.copy2(SourceFolder, TargetFolder)
 
 
-def main(add):
+def main():
     json_file = get_jsonfile()
 
     df = pd.read_json(json_file, orient='DataFrame')
@@ -74,7 +74,7 @@ def main(add):
     df['comment id'] = ""
 
     totalrows = 0
-    totalcomments = []         #lists containing all comment threads, all post ids and all posts
+    totalcomments = []  # lists containing all comment threads, all post ids and all posts
     totalids = []
     totalcommid = []
     totalposts = []
@@ -88,33 +88,40 @@ def main(add):
         dict_post = df['threads'][row]['post']
         totalposts.append(dict_post)
 
-    iterator = 0                             #variables for adding to the dataframe
+    iterator = 0  # variables for adding to the dataframe
     rownum = 0
-    for i in range (0, len(totalposts)) :    #needed this because if post is an image, the array will be empty, which throws an error
-        if len(totalposts[i]) == 0 :
+    # needed this because if post is an image, the array will be empty, which throws an error
+    for i in range(0, len(totalposts)):
+        if len(totalposts[i]) == 0:
             totalposts[i] = ''
 
-    for comment in totalcomments :          #make each comment its own row in the dataframe and add the necessary information to that row
+    for comment in totalcomments:  # make each comment its own row in the dataframe and add the necessary information to that row
         addpost = totalposts[iterator]
-        df2 = pd.DataFrame({'post': 0, 'text': addpost, 'post id': totalids[iterator], 'comment id': 0} , index= [rownum])
-        result2 = df.append(df2)           #append new row to the dataframe
+        df2 = pd.DataFrame({'post': 0, 'text': addpost,
+                            'post id': totalids[iterator], 'comment id': 0}, index=[rownum])
+        result2 = df.append(df2)  # append new row to the dataframe
         df = result2.copy()
         commentnum = 0
-        for comm in comment :
-            df1 = pd.DataFrame({'post': 0, 'text': comm, 'post id': totalids[iterator], 'comment id': totalcommid[iterator][commentnum]} , index= [rownum])
-            result = df.append(df1)           #append new row to the dataframe
+        for comm in comment:
+            df1 = pd.DataFrame(
+                {'post': 0, 'text': comm, 'post id': totalids[iterator], 'comment id': totalcommid[iterator][commentnum]}, index=[rownum])
+            result = df.append(df1)  # append new row to the dataframe
             df = result.copy()
             rownum = rownum + 1
             commentnum = commentnum + 1
         iterator = iterator + 1
 
-    df.drop_duplicates(subset=['text'], keep='last', inplace=True, ignore_index=True) #drop duplicate comments
+    # drop duplicate comments
+    df.drop_duplicates(subset=['text'], keep='last',
+                       inplace=True, ignore_index=True)
     df.drop(columns=['threads'], axis=1, inplace=True)
     df.drop(columns=['post'], axis=1, inplace=True)
-    if path.exists('data.csv') :
+    if path.exists('data.csv'):
         df.to_csv('data.csv', mode='a', header=False, index=False)
-        newdf = pd.read_csv('data.csv')                                   #ensures that duplicate comments are dropped from csv
-        newdf.drop_duplicates(subset=['text'], keep='first',inplace=True, ignore_index=True)
+        # ensures that duplicate comments are dropped from csv
+        newdf = pd.read_csv('data.csv')
+        newdf.drop_duplicates(
+            subset=['text'], keep='first', inplace=True, ignore_index=True)
         newdf.to_csv('data.csv', index=False)
     else:
         df.to_csv('data.csv', index=False)
@@ -125,14 +132,9 @@ def main(add):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Organize json data')
     parser.add_argument('--json', '--j', type=int, default=0)
-    parser.add_argument('--add', '--a', type=int, default=0,
-                        help='add to exisitng data file')
 
     args = parser.parse_args()
     if (args.json == 1):
         find_jsonfile()
 
-    main(args.add)
-
-
-
+    main()

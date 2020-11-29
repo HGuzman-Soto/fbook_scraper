@@ -26,8 +26,8 @@ def remove_entities(text):
             pass
         else:
             text_no_entities.append(item.text)
-    print(" ".join(text_no_entities))
-    return text_no_entities
+    # print(" ".join(text_no_entities))
+    return " ".join(text_no_entities)
 
 # TODO - below
 # 1) Make it run in O(n) instead of O(n^2)
@@ -45,17 +45,6 @@ def extract_content_words(text):
         token_class = token.pos_
         if (token_class == 'NOUN' or token_class == 'VERB' or token_class == 'ADV' or token_class == 'ADJ'):
             content_words.append(token)
-            # if text != text:
-            #     return text
-            # content_words = []
-
-            # # text_tokenize = nltk.word_tokenize(text)
-            # # text_tagged = nltk.pos_tag(text_tokenize)
-            # text_tagged = nltk.pos_tag(text)
-            # for word, word_class in text_tagged:
-            #     if (word_class == 'NN' or word_class == 'JJ' or word_class == 'RB' or word_class == 'VB'):
-            #         content_words.append(word)
-    print(content_words)
     return content_words
 
 
