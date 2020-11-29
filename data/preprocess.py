@@ -16,6 +16,8 @@ from nltk import word_tokenize
 
 
 def remove_entities(text):
+    if text != text:
+        return text
     text_no_entities = []
     nlp = spacy.load("en_core_web_sm")
     doc = nlp(text)
@@ -37,6 +39,9 @@ def remove_entities(text):
 
 
 def extract_content_words(text):
+    if text != text:
+        return text
+
     nlp = spacy.load("en_core_web_sm")
     doc = nlp(text)
 
@@ -45,6 +50,7 @@ def extract_content_words(text):
         token_class = token.pos_
         if (token_class == 'NOUN' or token_class == 'VERB' or token_class == 'ADV' or token_class == 'ADJ'):
             content_words.append(token)
+    print(content_words)
     return content_words
 
 
