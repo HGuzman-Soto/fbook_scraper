@@ -36,7 +36,7 @@ def remove_entities(text):
 """
 
 Input: String of text
-Output: A list of content words from the original text
+Output: A list of content words from the original cleaned text
 
 Method extracts content words based on if they are a noun, verb, adjective or adver
 
