@@ -3,14 +3,19 @@ from preprocess import clean
 from preprocess import remove_entities
 from preprocess import extract_content_words
 from preprocess import find_index_cw
+from preprocess import isValuableComment
 from os import path
 from pathlib import Path
 
 df = pd.read_csv('data.csv')
-
+# df = df[0:20]
 
 df['clean_comments'] = df.text.apply(lambda x: clean(x))
 # df['clean_comments'] = df.clean_comments.apply(lambda x: remove_entities(x))
+
+df = df[df.clean_comments.apply(lambda x: isValuableComment(x)) == True]
+
+
 df['content_words'] = df.clean_comments.apply(
     lambda x: extract_content_words(x))
 
