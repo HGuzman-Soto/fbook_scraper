@@ -9,6 +9,8 @@ import math
 import nltk
 import spacy
 import re
+import textstat
+
 from nltk.corpus import stopwords
 from nltk import word_tokenize
 
@@ -98,11 +100,13 @@ Input: A string of comments that has already been cleaned.
 Output: Boolean value that indicates whether to remove(False) or keep(True)
 
 Algorithm - Article inspiration:  https://medium.com/glose-team/how-to-evaluate-text-readability-with-nlp-9c04bd3f46a2
-1) Readability score - Flesch-Kincaid
-2) Mean number of syllables per word
-3) Mean number of words per sentence
-4) Number of pollysallables
-5) Length check (based on characters)
+I use text stat package for this: https://pypi.org/project/textstat/
+
+1) Length check (based on characters)
+2) Readability score - Flesch-Kincaid
+3) Mean number of syllables per word
+4) Mean number of words per sentence
+5) Number of pollysallables
 
 Additionally: https://towardsdatascience.com/linguistic-complexity-measures-for-text-nlp-e4bf664bd660
 
@@ -122,9 +126,19 @@ the number of nouns, verbs, adjectives and adverbs so there is probably no need.
 
 
 def isValuableComment(clean_text):
-
+    print("text:", clean_text)
     if (len(clean_text) < 50):
         return False
+
+    readability_score = textstat.flesch_reading_ease(clean_text)
+    syllable_count = textstat.syllable_count(clean_text)
+
+    # Score of 80-90 == easy (from 100 (very easy to hard))
+    if (readability_score > 85):
+        return False
+    print(readability_score)
+
+    return True
 
 
 #######################################################################################
