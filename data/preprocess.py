@@ -8,6 +8,7 @@ import re
 import math
 import nltk
 import spacy
+import re
 from nltk.corpus import stopwords
 from nltk import word_tokenize
 
@@ -31,11 +32,15 @@ def remove_entities(text):
     # print(" ".join(text_no_entities))
     return " ".join(text_no_entities)
 
-# TODO - below
-# 1) Make it run in O(n) instead of O(n^2)
-# 2) Edge cases --> VBP for instances and so on
-# 3) Maybe add its index?
-# 4) Transition to using Stanford Tagger later on
+
+"""
+
+Input: String of text
+Output: A list of content words from the original text
+
+Method extracts content words based on if they are a noun, verb, adjective or adver
+
+"""
 
 
 def extract_content_words(text):
@@ -54,7 +59,37 @@ def extract_content_words(text):
     return content_words
 
 
-# Split attached words from https://www.analyticsvidhya.com/blog/2014/11/text-data-cleaning-steps-python/
+"""
+Input: A string of the cleaned text and a list of a single content word (which are spacy token objects)
+Output: A list containing the starting and ending indexes of that content word in tuple form
+
+Issues: 
+
+1) There are multiple content words, we need to have them be a different column with its own index like in the original data set
+   I'm not sure the best approach here. I've not implemented this yet
+
+2) Duplication errors. For instance, if the same word appears multiple time this will always
+sget the first occurrence
+
+3) Spacy returns a spacy token. So the list of content words are actually spacy token objects. I need to read up on spacy more
+
+"""
+
+
+def find_index_cw(clean_text, content_words):
+    if (content_words != content_words or clean_text != clean_text):
+        return ""
+    index_list = []
+    for content_word in content_words:
+        content_word_str = str(content_word)
+        match = re.search(content_word_str, clean_text)
+        indexes = match.span()
+        print(indexes)
+        index_list.append(indexes)
+
+    return index_list
+
+    # Split attached words from https://www.analyticsvidhya.com/blog/2014/11/text-data-cleaning-steps-python/
 """
 Potential issues
 1) Does see more need a space and a period for a natural break?
