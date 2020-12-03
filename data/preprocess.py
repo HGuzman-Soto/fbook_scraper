@@ -12,7 +12,7 @@ import re
 from nltk.corpus import stopwords
 from nltk import word_tokenize
 
-
+#######################################################################################
 # relook at documentation, also this method is slow
 
 
@@ -33,6 +33,7 @@ def remove_entities(text):
     return " ".join(text_no_entities)
 
 
+#######################################################################################
 """
 
 Input: String of text
@@ -57,6 +58,8 @@ def extract_content_words(text):
             content_words.append(token)
     print(content_words)
     return content_words
+
+#######################################################################################
 
 
 """
@@ -86,11 +89,48 @@ def find_index_cw(clean_text, content_words):
         indexes = match.span()
         print(indexes)
         index_list.append(indexes)
-
     return index_list
 
-    # Split attached words from https://www.analyticsvidhya.com/blog/2014/11/text-data-cleaning-steps-python/
+
+#######################################################################################
 """
+Input: A string of comments that has already been cleaned.
+Output: Boolean value that indicates whether to remove(False) or keep(True)
+
+Algorithm - Article inspiration:  https://medium.com/glose-team/how-to-evaluate-text-readability-with-nlp-9c04bd3f46a2
+1) Readability score - Flesch-Kincaid
+2) Mean number of syllables per word
+3) Mean number of words per sentence
+4) Number of pollysallables
+5) Length check (based on characters)
+
+Additionally: https://towardsdatascience.com/linguistic-complexity-measures-for-text-nlp-e4bf664bd660
+
+Notes:
+1) There may be a second filter that we implement that after the content words are extracted, we might say
+if theres only 1 content word extracted and its not that signficant, i.e. 
+    a) The readability score is low
+    b) The length is low
+    c) etc. etc.
+
+Then just get rid of that entire row
+
+UPDATE: Now that I think about it no. Because we already know that information on the first filter. Like we will know
+the number of nouns, verbs, adjectives and adverbs so there is probably no need. 
+
+"""
+
+
+def isValuableComment(clean_text):
+
+    if (len(clean_text) < 50):
+        return False
+
+
+#######################################################################################
+"""
+# Split attached words from https://www.analyticsvidhya.com/blog/2014/11/text-data-cleaning-steps-python/
+
 Potential issues
 1) Does see more need a space and a period for a natural break?
 2) When removing special characters, sometimes there are special characters
@@ -100,6 +140,8 @@ This might be a potential issue
 3) Skip blank lines?
 
 """
+
+#######################################################################################
 
 
 def clean(text):
@@ -136,6 +178,8 @@ def clean(text):
 
     return text
 
+#######################################################################################
+
 # From https://gist.github.com/slowkow/7a7f61f495e3dbb7e3d767f97bd7304b below
 
 
@@ -162,14 +206,16 @@ def remove_emoji(string):
                                "]+", flags=re.UNICODE)
     return emoji_pattern.sub(r'', string)
 
-
+#######################################################################################
 # from https://towardsdatascience.com/a-practitioners-guide-to-natural-language-processing-part-i-processing-understanding-text-9f4abfd13e72
+
+
 def remove_special_characters(text, remove_digits=False):
     pattern = r'[^a-zA-z0-9\s]' if not remove_digits else r'[^a-zA-z\s]'
     text = re.sub(pattern, ' ', text)
     return text
 
-
+#######################################################################################
 # from https://towardsdatascience.com/nlp-building-text-cleanup-and-preprocessing-pipeline-eba4095245a0
 
 
@@ -186,3 +232,4 @@ def expand_contractions(text, map=CONTRACTION_MAP):
     new_text = pattern.sub(get_match, text)
     new_text = re.sub("'", "", new_text)
     return new_text
+#######################################################################################
