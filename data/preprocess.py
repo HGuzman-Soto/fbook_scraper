@@ -67,8 +67,11 @@ def extract_content_words(text):
 """
 Input: A string of the cleaned text and a list of a single content word (which are spacy token objects)
 Output: A list containing the starting and ending indexes of that content word in tuple form
+(starting_index, ending_index)
 
-Issues: 
+example output: {came: (20, 24), comment: (32, 39), section: (40, 47)}
+
+Issues:
 
 1) There are multiple content words, we need to have them be a different column with its own index like in the original data set
    I'm not sure the best approach here. I've not implemented this yet
@@ -91,7 +94,10 @@ def find_index_cw(clean_text, content_words):
         indexes = match.span()
         print(indexes)
         index_list.append(indexes)
-    return index_list
+    clean_text_lists = [clean_text] * len(content_words)
+
+    print(dict(zip(clean_text_lists, zip(content_words, index_list))))
+    return dict(zip(clean_text_lists, zip(content_words, index_list)))
 
 
 #######################################################################################
@@ -112,7 +118,7 @@ Additionally: https://towardsdatascience.com/linguistic-complexity-measures-for-
 
 Notes:
 1) There may be a second filter that we implement that after the content words are extracted, we might say
-if theres only 1 content word extracted and its not that signficant, i.e. 
+if theres only 1 content word extracted and its not that signficant, i.e.
     a) The readability score is low
     b) The length is low
     c) etc. etc.
@@ -120,7 +126,7 @@ if theres only 1 content word extracted and its not that signficant, i.e.
 Then just get rid of that entire row
 
 UPDATE: Now that I think about it no. Because we already know that information on the first filter. Like we will know
-the number of nouns, verbs, adjectives and adverbs so there is probably no need. 
+the number of nouns, verbs, adjectives and adverbs so there is probably no need.
 
 """
 
