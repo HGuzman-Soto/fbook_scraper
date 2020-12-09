@@ -41,7 +41,7 @@ def remove_entities(text):
 Input: String of text
 Output: A list of content words from the original cleaned text
 
-Method extracts content words based on if they are a noun, verb, adjective or adver
+Method extracts content words based on if they are a noun, verb, adjective or adverb
 
 """
 
@@ -154,8 +154,6 @@ This might be a potential issue
 3) Skip blank lines?
 
 """
-
-#######################################################################################
 
 
 def clean(text):
