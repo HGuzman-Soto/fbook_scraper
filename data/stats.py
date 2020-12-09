@@ -8,7 +8,7 @@ from os import path
 from pathlib import Path
 
 df = pd.read_csv('data.csv')
-# df = df[0:20]
+df = df[0:200]
 
 df['clean_comments'] = df.text.apply(lambda x: clean(x))
 # df['clean_comments'] = df.clean_comments.apply(lambda x: remove_entities(x))
