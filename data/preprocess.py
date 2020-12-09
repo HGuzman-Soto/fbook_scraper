@@ -14,26 +14,6 @@ import textstat
 from nltk.corpus import stopwords
 from nltk import word_tokenize
 
-#######################################################################################
-# relook at documentation, also this method is slow
-
-
-def remove_entities(text):
-    if text != text:
-        return text
-    text_no_entities = []
-    nlp = spacy.load("en_core_web_sm")
-    doc = nlp(text)
-    ents = [e.text for e in doc.ents]
-
-    for item in doc:
-        if item.text in ents:
-            pass
-        else:
-            text_no_entities.append(item.text)
-    # print(" ".join(text_no_entities))
-    return " ".join(text_no_entities)
-
 
 #######################################################################################
 """
@@ -43,6 +23,14 @@ Output: A list of content words from the original cleaned text
 
 Method extracts content words based on if they are a noun, verb, adjective or adverb
 
+
+Note: I combined the ner step here as 
+a) Faster for spacy to do it all at once 
+b) Need to remove entity when processing text. We can't remove entities from a list
+
+But, this particular method can only remove entities that are a single token and also performance a bit poor
+
+Look into this for stanford tagger when time permits: https://www.kdnuggets.com/2018/08/named-entity-recognition-practitioners-guide-nlp-4.html
 """
 
 
@@ -52,12 +40,17 @@ def extract_content_words(text):
 
     nlp = spacy.load("en_core_web_sm")
     doc = nlp(text)
+    ents = [e.text for e in doc.ents]
 
     content_words = []
     for token in doc:
         token_class = token.pos_
         if (token_class == 'NOUN' or token_class == 'VERB' or token_class == 'ADV' or token_class == 'ADJ'):
-            content_words.append(token)
+            # Check if that token is not an entity
+            if(token.text not in ents):
+                content_words.append(token)
+            else:  # this is for testing
+                print("Removed entity:", token.text, "\n")
     print(content_words)
     return content_words
 
