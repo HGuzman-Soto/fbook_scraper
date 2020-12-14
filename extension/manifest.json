@@ -9,7 +9,9 @@
     "storage",
     "unlimitedStorage",
     "downloads",
-    "contextMenus"
+    "contextMenus",
+    "https://*/",
+    "webNavigation"
   ],
   "background": { "persistent": false, "scripts": ["ext/cm.js"] },
   "content_scripts": [
@@ -22,8 +24,7 @@
         "lib/model/model.js",
         "lib/model/thread.js",
         "lib/util.js",
-        "ext/fb.js",
-        "ext/scrape.js"
+        "ext/fb.js"
       ]
     }
   ],

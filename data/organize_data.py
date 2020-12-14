@@ -65,16 +65,16 @@ def find_jsonfile():
     shutil.copy2(SourceFolder, TargetFolder)
 
 
-def main(add):
+def main():
     json_file = get_jsonfile()
 
     df = pd.read_json(json_file, orient='DataFrame')
-
     df['text'] = ""
     df['id'] = ""
 
+
     totalrows = 0
-    totalcomments = []         #lists containing all comment threads, all post ids and all posts
+    totalcomments = []  # lists containing all comment threads, all post ids and all posts
     totalids = []
     totalcommid = []
     totalposts = []
@@ -90,8 +90,9 @@ def main(add):
 
     iterator = 0                             #variables for adding to the dataframe
     rownum = 0
-    for i in range (0, len(totalposts)) :    #needed this because if post is an image, the array will be empty, which throws an error
-        if len(totalposts[i]) == 0 :
+    # needed this because if post is an image, the array will be empty, which throws an error
+    for i in range(0, len(totalposts)):
+        if len(totalposts[i]) == 0:
             totalposts[i] = ''
 
     for comment in totalcomments :          #make each comment its own row in the dataframe and add the necessary information to that row
@@ -134,11 +135,8 @@ def main(add):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Organize json data')
     parser.add_argument('--json', '--j', type=int, default=0)
-    parser.add_argument('--add', '--a', type=int, default=0,
-                        help='add to exisitng data file')
 
     args = parser.parse_args()
     if (args.json == 1):
         find_jsonfile()
-
-    main(args.add)
+    main()
