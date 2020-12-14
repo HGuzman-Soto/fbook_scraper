@@ -71,7 +71,7 @@ def main(add):
     df = pd.read_json(json_file, orient='DataFrame')
 
     df['text'] = ""
-    df['id(post,comment,sentence)'] = ""
+    df['id'] = ""
 
     totalrows = 0
     totalcomments = []         #lists containing all comment threads, all post ids and all posts
@@ -99,7 +99,7 @@ def main(add):
         postlist = sent_tokenize(str(addpost))
         sentcount = 1
         for item in postlist:
-            df2 = pd.DataFrame({'post': 0, 'text': item, 'id(post,comment,sentence)': str(iterator) + "_" + str(0) + "_" + str(sentcount)} , index= [rownum])
+            df2 = pd.DataFrame({'post': 0, 'text': item, 'id': str(iterator) + "_" + str(0) + "_" + str(sentcount)} , index= [rownum])
             result2 = df.append(df2)           #append new row to the dataframe
             df = result2.copy()
             rownum = rownum + 1
@@ -109,7 +109,7 @@ def main(add):
             sentnum = 1
             commlist = sent_tokenize(comm)
             for element in commlist:
-                df1 = pd.DataFrame({'post': 0, 'text': element, 'id(post,comment,sentence)':str(iterator) + "_" + str(commentnum) + "_" + str(sentnum)} , index= [rownum])
+                df1 = pd.DataFrame({'post': 0, 'text': element, 'id':str(iterator) + "_" + str(commentnum) + "_" + str(sentnum)} , index= [rownum])
                 result = df.append(df1)           #append new row to the dataframe
                 df = result.copy()
                 rownum = rownum + 1
