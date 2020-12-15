@@ -121,6 +121,8 @@ the number of nouns, verbs, adjectives and adverbs so there is probably no need.
 
 
 def isValuableComment(clean_text):
+    if clean_text != clean_text:
+        return False
     print("text:", clean_text)
     if (len(clean_text) <= 10):
         return False
