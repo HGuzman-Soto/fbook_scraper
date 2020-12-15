@@ -131,8 +131,8 @@ def isValuableComment(clean_text):
     syllable_count = textstat.syllable_count(clean_text)
 
     # Score of 80-90 == easy (from 100 (very easy to hard))
-    if (readability_score > 85):
-        return False
+    # if (readability_score > 85):
+    #     return False
     # print(readability_score)
 
     return True
