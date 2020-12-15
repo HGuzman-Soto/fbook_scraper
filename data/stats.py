@@ -7,7 +7,6 @@ from os import path
 from pathlib import Path
 
 df = pd.read_csv('data.csv')
-df = df[0:10]
 
 
 """todo
