@@ -138,7 +138,7 @@ def isValuableComment(clean_text):
     # Score of 80-90 == easy (from 100 (very easy to hard))
     if (readability_score > 85):
         return False
-    print(readability_score)
+    # print(readability_score)
 
     return True
 
