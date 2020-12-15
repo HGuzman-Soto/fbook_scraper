@@ -1,6 +1,5 @@
 import pandas as pd
 from preprocess import clean
-from preprocess import remove_entities
 from preprocess import extract_content_words
 from preprocess import find_index_cw
 from preprocess import isValuableComment
