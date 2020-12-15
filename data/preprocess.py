@@ -66,10 +66,11 @@ def extract_content_words(text):
 
 """
 Input: A string of the cleaned text and a list of a single content word (which are spacy token objects)
-Output: A list containing the starting and ending indexes of that content word in tuple form
+Output: The starting and ending indexes of that content word in tuple form
 (starting_index, ending_index)
 
-example output: {came: (20, 24), comment: (32, 39), section: (40, 47)}
+example input: ['I like food'], 'food'
+example output: (7, 10)
 
 Issues:
 
@@ -84,20 +85,15 @@ sget the first occurrence
 """
 
 
-def find_index_cw(clean_text, content_words):
-    if (content_words != content_words or clean_text != clean_text):
+def find_index_cw(clean_text, content_word):
+    if (content_word != content_word or clean_text != clean_text):
         return ""
-    index_list = []
-    for content_word in content_words:
-        content_word_str = str(content_word)
-        match = re.search(content_word_str, clean_text)
-        indexes = match.span()
-        print(indexes)
-        index_list.append(indexes)
-    clean_text_lists = [clean_text] * len(content_words)
-
-    print(dict(zip(clean_text_lists, zip(content_words, index_list))))
-    return dict(zip(clean_text_lists, zip(content_words, index_list)))
+    word_tuple = {}
+    content_word_str = str(content_word)
+    match = re.search(content_word_str, clean_text)
+    indexes = match.span()
+    # print(indexes)
+    return indexes
 
 
 #######################################################################################
@@ -133,7 +129,7 @@ the number of nouns, verbs, adjectives and adverbs so there is probably no need.
 
 def isValuableComment(clean_text):
     print("text:", clean_text)
-    if (len(clean_text) < 50):
+    if (len(clean_text) <= 10):
         return False
 
     readability_score = textstat.flesch_reading_ease(clean_text)
