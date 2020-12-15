@@ -59,9 +59,13 @@ def extract_content_words(text):
 
 """
 Input: A string of the cleaned text and a list of a single content word (which are spacy token objects)
-Output: A list containing the starting and ending indexes of that content word in tuple form
+Output: The starting and ending indexes of that content word in tuple form
+(starting_index, ending_index)
 
-Issues: 
+example input: ['I like food'], 'food'
+example output: (7, 10)
+
+Issues:
 
 1) There are multiple content words, we need to have them be a different column with its own index like in the original data set
    I'm not sure the best approach here. I've not implemented this yet
@@ -74,17 +78,15 @@ sget the first occurrence
 """
 
 
-def find_index_cw(clean_text, content_words):
-    if (content_words != content_words or clean_text != clean_text):
+def find_index_cw(clean_text, content_word):
+    if (content_word != content_word or clean_text != clean_text):
         return ""
-    index_list = []
-    for content_word in content_words:
-        content_word_str = str(content_word)
-        match = re.search(content_word_str, clean_text)
-        indexes = match.span()
-        print(indexes)
-        index_list.append(indexes)
-    return index_list
+    word_tuple = {}
+    content_word_str = str(content_word)
+    match = re.search(content_word_str, clean_text)
+    indexes = match.span()
+    # print(indexes)
+    return indexes
 
 
 #######################################################################################
@@ -105,7 +107,7 @@ Additionally: https://towardsdatascience.com/linguistic-complexity-measures-for-
 
 Notes:
 1) There may be a second filter that we implement that after the content words are extracted, we might say
-if theres only 1 content word extracted and its not that signficant, i.e. 
+if theres only 1 content word extracted and its not that signficant, i.e.
     a) The readability score is low
     b) The length is low
     c) etc. etc.
@@ -113,14 +115,14 @@ if theres only 1 content word extracted and its not that signficant, i.e.
 Then just get rid of that entire row
 
 UPDATE: Now that I think about it no. Because we already know that information on the first filter. Like we will know
-the number of nouns, verbs, adjectives and adverbs so there is probably no need. 
+the number of nouns, verbs, adjectives and adverbs so there is probably no need.
 
 """
 
 
 def isValuableComment(clean_text):
     print("text:", clean_text)
-    if (len(clean_text) < 50):
+    if (len(clean_text) <= 10):
         return False
 
     readability_score = textstat.flesch_reading_ease(clean_text)
@@ -129,7 +131,7 @@ def isValuableComment(clean_text):
     # Score of 80-90 == easy (from 100 (very easy to hard))
     if (readability_score > 85):
         return False
-    print(readability_score)
+    # print(readability_score)
 
     return True
 
