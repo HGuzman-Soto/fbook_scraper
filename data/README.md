@@ -24,5 +24,5 @@ content_word - corresponds to extracted content words (list)
 starting_index - corresponds the beginning index of the content word, from the cleaned text
 ending_index - corresponds to the ending index of the content word, from the cleaned text
 
-
+## Diagram of pipeline architecture 
 ![GitHub Logo](diagrams/pipeline_high.png)
