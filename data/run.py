@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from preprocess import clean
 from preprocess import extract_content_words
@@ -6,9 +7,8 @@ from preprocess import isValuableComment
 from os import path
 from pathlib import Path
 
-df = pd.read_csv('data.csv')
-df = df[0:10]
-
+df = pd.read_csv('temp_data.csv')
+# df = df[0:10]
 
 """todo
 1) rename this file
@@ -33,13 +33,23 @@ df = df[df.clean_text.apply(lambda x: isValuableComment(x)) == True]
 df['content_word'] = df.clean_text.apply(
     lambda x: extract_content_words(x))
 
+print("\n")
+print("Expanding content word lists \n")
 df = df.explode('content_word')
 
+
+print("Attaching indexes to each content words \n")
 df[['starting_index', 'ending_index']] = df.apply(lambda x: find_index_cw(
     x.clean_text, x.content_word), axis=1)
 
 
-if path.exists('data_clean.csv'):
-    df.to_csv('data_clean.csv', mode='a', header=False, index=False)
+if path.exists('data.csv'):
+    df.to_csv('data.csv', mode='a', header=False, index=False)
+    os.remove('temp_data.csv')
+
 else:
-    df.to_csv('data_clean.csv',  index=False)
+    df.to_csv('data.csv', index=False)
+    os.remove('temp_data.csv')
+
+
+print("Finished")

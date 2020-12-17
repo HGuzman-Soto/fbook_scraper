@@ -52,7 +52,7 @@ def extract_content_words(text):
                 content_words.append(token)
             else:  # this is for testing
                 print("Removed entity:", token.text, "\n")
-    print("extracted content words: ", content_words)
+    print("content words: ", content_words)
     return content_words
 
 #######################################################################################
@@ -61,7 +61,7 @@ def extract_content_words(text):
 """
 Input: A string of the cleaned text and a list of a single content word (which are spacy token objects)
 Output: The starting and ending indexes of that content word in tuple form
-(starting_index, ending_index) ---> mapped to individual indexes (two things returned)
+(starting_index, ending_index) ---> mapped to a pd.series
 
 example input: ['I like food'], 'food'
 example output: (7, 10) ---> 7, 10
@@ -75,6 +75,10 @@ Issues:
 sget the first occurrence
 
 3) Spacy returns a spacy token. So the list of content words are actually spacy token objects. I need to read up on spacy more
+
+TODO: Current solution: https://stackoverflow.com/questions/47969756/pandas-apply-function-that-returns-two-new-columns
+Its been stated that this is not an optimal solution (very memory intensive)
+
 
 """
 

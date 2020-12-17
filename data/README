@@ -8,7 +8,8 @@ Note: you can either
 
 2) Next, run.py
 
-
+This will run preprocessing on the text and extract content words using POS tagging and NER. 
+It will also attach the starting and ending indexes of each content word
 
 
 
