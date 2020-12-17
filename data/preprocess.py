@@ -47,11 +47,11 @@ def extract_content_words(text):
     for token in doc:
         token_class = token.pos_
         if (token_class == 'NOUN' or token_class == 'VERB' or token_class == 'ADV' or token_class == 'ADJ'):
-            # Check if that token is not an entity
-            if(token.text not in ents):
+            # Check if that token is not an entity or function word
+            if(token.text not in ents and token.is_stop == False):
                 content_words.append(token)
             else:  # this is for testing
-                print("Removed entity:", token.text, "\n")
+                print("Removed word:", token.text, "\n")
     print("content words: ", content_words)
     return content_words
 
