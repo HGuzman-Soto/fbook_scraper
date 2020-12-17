@@ -23,3 +23,4 @@ starting_index - corresponds the beginning index of the content word, from the c
 ending_index - corresponds to the ending index of the content word, from the cleaned text
 
 
+![GitHub Logo](fbook_scraper/diagrams/pipeline_high.png)
