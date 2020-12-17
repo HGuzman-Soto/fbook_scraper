@@ -22,7 +22,7 @@ It will also attach the starting and ending indexes of each content word
 * clean_text - preprocessed text
 * content_word - extracted content word
 * starting_index - beginning index of the content word, from the cleaned text
-( ending_index - ending index of the content word, from the cleaned text
+* ending_index - ending index of the content word, from the cleaned text
 
 ## Diagram of pipeline architecture 
 ![GitHub Logo](diagrams/pipeline_high.png)
