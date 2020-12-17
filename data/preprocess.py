@@ -38,7 +38,8 @@ def extract_content_words(text):
     if text != text:
         return text
 
-    nlp = spacy.load("en_core_web_sm")
+    nlp = spacy.load("en_core_web_sm", disable=[
+                     "parser", "textcat", "tokenizer"])
     doc = nlp(text)
     ents = [e.text for e in doc.ents]
 
@@ -159,7 +160,7 @@ def clean(text):
         return text
 
     # remove see more
-    text = re.sub(r' ?\w*?[…]see more.', '', text, flags=re.I)
+    text = re.sub(r' ?\w*?[…]see more', '', text, flags=re.I)
 
     # remove urls
     text = re.sub(r'http:?\S+|www.\S+', '', text)
