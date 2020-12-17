@@ -17,12 +17,12 @@ It will also attach the starting and ending indexes of each content word
 
 ## Columns are identified as such:
 
-text - corresponds to the raw text (string)
-id - corresponds to postID_commentID_sentenceID (string)
-clean_text - corresponds to the preprocess text (string)
-content_word - corresponds to extracted content words (list)
-starting_index - corresponds the beginning index of the content word, from the cleaned text
-ending_index - corresponds to the ending index of the content word, from the cleaned text
+* text - raw social media text. Includes post + comment
+* id - postID_commentID_sentenceID 
+* clean_text - preprocessed text
+* content_word - extracted content word
+* starting_index - beginning index of the content word, from the cleaned text
+( ending_index - ending index of the content word, from the cleaned text
 
 ## Diagram of pipeline architecture 
 ![GitHub Logo](diagrams/pipeline_high.png)
