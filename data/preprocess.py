@@ -52,7 +52,7 @@ def extract_content_words(text):
                 content_words.append(token)
             else:  # this is for testing
                 print("Removed entity:", token.text, "\n")
-    print(content_words)
+    print("extracted content words: ", content_words)
     return content_words
 
 #######################################################################################
@@ -61,10 +61,10 @@ def extract_content_words(text):
 """
 Input: A string of the cleaned text and a list of a single content word (which are spacy token objects)
 Output: The starting and ending indexes of that content word in tuple form
-(starting_index, ending_index)
+(starting_index, ending_index) ---> mapped to individual indexes (two things returned)
 
 example input: ['I like food'], 'food'
-example output: (7, 10)
+example output: (7, 10) ---> 7, 10
 
 Issues:
 
@@ -81,13 +81,12 @@ sget the first occurrence
 
 def find_index_cw(clean_text, content_word):
     if (content_word != content_word or clean_text != clean_text):
-        return ""
+        return pd.Series([math.nan, math.nan])
     word_tuple = {}
     content_word_str = str(content_word)
     match = re.search(content_word_str, clean_text)
     indexes = match.span()
-    # print(indexes)
-    return indexes
+    return pd.Series([indexes[0], indexes[1]])
 
 
 #######################################################################################
@@ -124,7 +123,7 @@ the number of nouns, verbs, adjectives and adverbs so there is probably no need.
 def isValuableComment(clean_text):
     if clean_text != clean_text:
         return False
-    print("text:", clean_text)
+    print("clean text:", clean_text)
     if (len(clean_text) <= 10):
         return False
 

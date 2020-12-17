@@ -7,6 +7,7 @@ from os import path
 from pathlib import Path
 
 df = pd.read_csv('data.csv')
+df = df[0:10]
 
 
 """todo
@@ -24,18 +25,18 @@ Steps
 """
 
 
-df['clean_comments'] = df.text.apply(lambda x: clean(x))
+df['clean_text'] = df.text.apply(lambda x: clean(x))
 
-df = df[df.clean_comments.apply(lambda x: isValuableComment(x)) == True]
+df = df[df.clean_text.apply(lambda x: isValuableComment(x)) == True]
 
 
-df['content_word'] = df.clean_comments.apply(
+df['content_word'] = df.clean_text.apply(
     lambda x: extract_content_words(x))
 
 df = df.explode('content_word')
 
-df['index'] = df.apply(lambda x: find_index_cw(
-    x.clean_comments, x.content_word), axis=1)
+df[['starting_index', 'ending_index']] = df.apply(lambda x: find_index_cw(
+    x.clean_text, x.content_word), axis=1)
 
 
 if path.exists('data_clean.csv'):
