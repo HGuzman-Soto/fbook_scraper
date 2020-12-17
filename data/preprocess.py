@@ -76,7 +76,6 @@ sget the first occurrence
 
 3) Spacy returns a spacy token. So the list of content words are actually spacy token objects. I need to read up on spacy more
 
-TODO: Current solution: https://stackoverflow.com/questions/47969756/pandas-apply-function-that-returns-two-new-columns
 Its been stated that this is not an optimal solution (very memory intensive)
 
 
