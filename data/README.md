@@ -3,8 +3,8 @@
 ## 1. Run unpack_json.py to unpack json object into proper data format (text, id)
 
 Note: you can either <br>
-        * a) manually place the json file in the directory or
-        * b) run unpack_json.py with --j command to automatically retrieve the last
+        1. manually place the json file in the directory and run unpack_json.py
+        2. or run unpack_json.py with --j command to automatically retrieve the last
         downloaded json file from the scraper
 
 
