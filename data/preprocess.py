@@ -89,7 +89,7 @@ def find_index_cw(clean_text, content_word):
     content_word_str = str(content_word)
     match = re.search(content_word_str, clean_text)
     indexes = match.span()
-    return pd.Series([indexes[0], indexes[1]])
+    return pd.Series([int(indexes[0]), int(indexes[1])])
 
 
 ######################################################################################
