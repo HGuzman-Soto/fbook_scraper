@@ -5,6 +5,10 @@
 __pycache__/
 *.py[cod]
 
+#data files
+data.csv
+
+
 # compiled output
 /dist
 /tmp
