@@ -15,7 +15,7 @@ from nltk.corpus import stopwords
 from nltk import word_tokenize
 
 
-#######################################################################################
+######################################################################################
 """
 
 Input: String of text
@@ -55,7 +55,7 @@ def extract_content_words(text):
     print("content words: ", content_words)
     return content_words
 
-#######################################################################################
+######################################################################################
 
 
 """
@@ -92,7 +92,7 @@ def find_index_cw(clean_text, content_word):
     return pd.Series([indexes[0], indexes[1]])
 
 
-#######################################################################################
+######################################################################################
 """
 Input: A string of comments that has already been cleaned.
 Output: Boolean value that indicates whether to remove(False) or keep(True)
@@ -141,7 +141,7 @@ def isValuableComment(clean_text):
     return True
 
 
-#######################################################################################
+######################################################################################
 """
 # Split attached words from https://www.analyticsvidhya.com/blog/2014/11/text-data-cleaning-steps-python/
 
@@ -190,7 +190,7 @@ def clean(text):
 
     return text
 
-#######################################################################################
+######################################################################################
 
 # From https://gist.github.com/slowkow/7a7f61f495e3dbb7e3d767f97bd7304b below
 
@@ -218,7 +218,7 @@ def remove_emoji(string):
                                "]+", flags=re.UNICODE)
     return emoji_pattern.sub(r'', string)
 
-#######################################################################################
+######################################################################################
 # from https://towardsdatascience.com/a-practitioners-guide-to-natural-language-processing-part-i-processing-understanding-text-9f4abfd13e72
 
 
@@ -227,7 +227,7 @@ def remove_special_characters(text, remove_digits=False):
     text = re.sub(pattern, ' ', text)
     return text
 
-#######################################################################################
+######################################################################################
 # from https://towardsdatascience.com/nlp-building-text-cleanup-and-preprocessing-pipeline-eba4095245a0
 
 
@@ -244,4 +244,4 @@ def expand_contractions(text, map=CONTRACTION_MAP):
     new_text = pattern.sub(get_match, text)
     new_text = re.sub("'", "", new_text)
     return new_text
-#######################################################################################
+######################################################################################
