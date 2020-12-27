@@ -8,6 +8,7 @@ import regex as re
 
 # Load the data set that needs populating
 # wikinews done, News_test_complete, Wikipedia_Test_complete, Wikipedia_Train
+##########################################################################################################
 
 Wikinews = True
 
@@ -17,7 +18,7 @@ for x in array:
 
     location = 'actual-test-sets/'+x+'.tsv'
     data_frame = pd.read_table(location, names=('ID', 'sentence', 'start_index', 'end_index', 'phrase', 'total_native',
-                               'total_non_native', 'native_complex', 'non_native_complex', 'complex_binary', 'complex_probabilistic'))
+                                                'total_non_native', 'native_complex', 'non_native_complex', 'complex_binary', 'complex_probabilistic'))
 
     data_frame['split'] = data_frame['phrase'].apply(lambda x: x.split())
 
@@ -31,6 +32,8 @@ for x in array:
     word_set = pd.DataFrame(word_set)
     word_set.columns = ['phrase']
 
+
+##########################################################################################################
     # Cleaning function for words
     remove = string.punctuation
     remove = remove.replace("-", "")
@@ -41,6 +44,7 @@ for x in array:
     word_set['phrase'] = word_set['phrase'].apply(
         lambda x: x.translate({ord(char): None for char in remove}))
 
+##########################################################################################################
     # function to obtain syablles for words
     from datamuse import datamuse
     api = datamuse.Datamuse()
@@ -68,6 +72,9 @@ for x in array:
 
     word_features = pd.merge(words, word_set)
 
+
+##########################################################################################################
+
     # Now parse
     import pycorenlp
     import pandas as pd
@@ -77,6 +84,8 @@ for x in array:
     sentences = data_frame[['sentence', 'ID']].copy()
 
     sentences = sentences.drop_duplicates()
+
+##########################################################################################################
 
     def removefirsttoken(x):
         x = x.split(' ', 1)[1]
@@ -88,6 +97,8 @@ for x in array:
 
     else:
         sentences['clean sentence'] = sentences['sentence']
+
+##########################################################################################################
 
     # function to parse sentences
     def parse(string):
@@ -105,8 +116,9 @@ for x in array:
     # Merge
     word_parse_features = pd.merge(sentences, word_features)
 
-    # Work out POS and dep number for words in word_parse_features
+##########################################################################################################
 
+    # Work out POS and dep number for words in word_parse_features
     def get_pos(row):
         word = row['phrase']
         parse = row['parse']
@@ -119,6 +131,8 @@ for x in array:
 
             if comp_word == word:
                 return parse['sentences'][0]['tokens'][i]['pos']
+
+##########################################################################################################
 
     def get_dep(row):
         number = 0
@@ -134,6 +148,8 @@ for x in array:
                 number += 1
 
         return number
+
+##########################################################################################################
 
     # Function to get the proper lemma
 
@@ -152,8 +168,12 @@ for x in array:
         else:
             return None
 
+##########################################################################################################
+
     from nltk.stem import WordNetLemmatizer
     wordnet_lemmatizer = WordNetLemmatizer()
+
+##########################################################################################################
 
     def lemmatiser(row):
 
@@ -169,10 +189,13 @@ for x in array:
                 return lemma
             except:
                 print(word)
+##########################################################################################################
 
     # return MRC scores
     mrc_features = pd.read_table('corpus/MRC.tsv', names=('word', 'AOA', 'BFRQ', 'CNC',
                                                           'KFCAT', 'FAM', 'KFSMP', 'IMG', 'KFFRQ', 'NLET', 'CMEAN', 'PMEAN', 'NPHN', 'T-LFRQ'))
+
+##########################################################################################################
 
     def aoa(word):
         word = ''.join(word.split()).lower()
@@ -182,6 +205,7 @@ for x in array:
             return fvalue
         except:
             return 0
+##########################################################################################################
 
     def cnc(word):
         word = ''.join(word.split()).lower()
@@ -192,6 +216,8 @@ for x in array:
         except:
             return 0
 
+##########################################################################################################
+
     def fam(word):
         word = ''.join(word.split()).lower()
         try:
@@ -200,6 +226,8 @@ for x in array:
             return fvalue
         except:
             return 0
+
+##########################################################################################################
 
     def img(word):
         word = ''.join(word.split()).lower()
@@ -210,6 +238,8 @@ for x in array:
         except:
             return 0
 
+##########################################################################################################
+
     def phon(word):
         word = ''.join(word.split()).lower()
         try:
@@ -218,6 +248,8 @@ for x in array:
             return fvalue
         except:
             return 0
+
+##########################################################################################################
 
     # functions using wordnet
     from nltk.corpus import wordnet
@@ -231,6 +263,8 @@ for x in array:
         except:
             return synonyms
 
+##########################################################################################################
+
     def hypernyms(word):
         hypernyms = 0
         try:
@@ -239,6 +273,8 @@ for x in array:
             return hypernyms
         except:
             return hypernyms
+
+##########################################################################################################
 
     def hyponyms(word):
         hyponyms = 0
@@ -251,6 +287,8 @@ for x in array:
             return hyponyms
         except:
             return hyponyms
+
+##########################################################################################################
 
     # return CEFR levels
     all_levels = pd.read_table(
@@ -271,121 +309,141 @@ for x in array:
             except:
                 return 0
 
+##########################################################################################################
+
     # CNC, KFCAT, FAM, KFSMP, KFFRQ, NLET, NPHN, T-LFRQ
 
     def CNC_fun(word):
 
-          table = mrc_features[mrc_features['word'] == word]
+        table = mrc_features[mrc_features['word'] == word]
 
-           if len(table) > 0:
+        if len(table) > 0:
 
-                CNC = table['CNC'].values[0]
-                CNC = int(CNC)
+            CNC = table['CNC'].values[0]
+            CNC = int(CNC)
 
-                return CNC
-            else:
-                y = 0
-                return y
+            return CNC
+        else:
+            y = 0
+            return y
+
+##########################################################################################################
 
     def KFCAT_fun(word):
 
-          table = mrc_features[mrc_features['word'] == word]
+        table = mrc_features[mrc_features['word'] == word]
 
-           if len(table) > 0:
+        if len(table) > 0:
 
-                KFCAT = table['KFCAT'].values[0]
-                KFCAT = int(KFCAT)
+            KFCAT = table['KFCAT'].values[0]
+            KFCAT = int(KFCAT)
 
-                return KFCAT
-            else:
-                y = 0
-                return y
+            return KFCAT
+        else:
+            y = 0
+            return y
+
+##########################################################################################################
 
     def FAM_fun(word):
 
-          table = mrc_features[mrc_features['word'] == word]
+        table = mrc_features[mrc_features['word'] == word]
 
-           if len(table) > 0:
+        if len(table) > 0:
 
-                FAM = table['FAM'].values[0]
-                FAM = int(FAM)
+            FAM = table['FAM'].values[0]
+            FAM = int(FAM)
 
-                return FAM
-            else:
-                y = 0
-                return y
+            return FAM
+        else:
+            y = 0
+            return y
+
+##########################################################################################################
 
     def KFSMP_fun(word):
 
-          table = mrc_features[mrc_features['word'] == word]
+        table = mrc_features[mrc_features['word'] == word]
 
-           if len(table) > 0:
+        if len(table) > 0:
 
-                KFSMP = table['KFSMP'].values[0]
-                KFSMP = int(KFSMP)
+            KFSMP = table['KFSMP'].values[0]
+            KFSMP = int(KFSMP)
 
-                return KFSMP
-            else:
-                y = 0
-                return y
+            return KFSMP
+        else:
+            y = 0
+            return y
+
+##########################################################################################################
 
     def KFFRQ_fun(word):
 
-          table = mrc_features[mrc_features['word'] == word]
+        table = mrc_features[mrc_features['word'] == word]
 
-           if len(table) > 0:
+        if len(table) > 0:
 
-                KFFRQ = table['KFFRQ'].values[0]
-                KFFRQ = int(KFFRQ)
+            KFFRQ = table['KFFRQ'].values[0]
+            KFFRQ = int(KFFRQ)
 
-                return KFFRQ
-            else:
-                y = 0
-                return y
+            return KFFRQ
+        else:
+            y = 0
+            return y
+
+##########################################################################################################
 
     def NLET_fun(word):
 
-          table = mrc_features[mrc_features['word'] == word]
+        table = mrc_features[mrc_features['word'] == word]
 
-           if len(table) > 0:
+        if len(table) > 0:
 
-                NLET = table['NLET'].values[0]
-                NLET = int(NLET)
+            NLET = table['NLET'].values[0]
+            NLET = int(NLET)
 
-                return NLET
-            else:
-                y = 0
-                return y
+            return NLET
+        else:
+            y = 0
+            return y
+
+##########################################################################################################
 
     def NPHN_fun(word):
 
-          table = mrc_features[mrc_features['word'] == word]
+        table = mrc_features[mrc_features['word'] == word]
 
-           if len(table) > 0:
+        if len(table) > 0:
 
-                NPHN = table['NPHN'].values[0]
-                NPHN = int(NPHN)
+            NPHN = table['NPHN'].values[0]
+            NPHN = int(NPHN)
 
-                return NPHN
-            else:
-                y = 0
-                return y
+            return NPHN
+        else:
+            y = 0
+            return y
+
+##########################################################################################################
 
     def TLFRQ_fun(word):
 
-          table = mrc_features[mrc_features['word'] == word]
+        table = mrc_features[mrc_features['word'] == word]
 
-           if len(table) > 0:
+        if len(table) > 0:
 
-                TLFRQ = table['T-LFRQ'].values[0]
-                TLFRQ = int(TLFRQ)
+            TLFRQ = table['T-LFRQ'].values[0]
+            TLFRQ = int(TLFRQ)
 
-                return TLFRQ
-            else:
-                y = 0
-                return y
+            return TLFRQ
+        else:
+            y = 0
+            return y
+
+
+##########################################################################################################
 
     # Convert tree bank tags to ones that are compatible w google
+
 
     def is_noun(tag):
         return tag in ['NN', 'NNS', 'NNP', 'NNPS']
@@ -401,13 +459,13 @@ for x in array:
 
     def penn_to_wn(tag):
         if is_adjective(tag):
-            return wn.ADJ
+            return wordnet.ADJ
         elif is_noun(tag):
-            return wn.NOUN
+            return wordnet.NOUN
         elif is_adverb(tag):
-            return wn.ADV
+            return wordnet.ADV
         elif is_verb(tag):
-            return wn.VERB
+            return wordnet.VERB
         return None
 
     def penn_to_google(tag):
@@ -420,6 +478,8 @@ for x in array:
         elif is_verb(tag):
             return 'v'
         return None
+
+##########################################################################################################
 
     def get_frequency(row):
         nofreq = float(0.000000)
@@ -459,14 +519,22 @@ for x in array:
 
             return nofreq
 
+##########################################################################################################
+
     # GET DEP AND POS NUMBER
     word_parse_features['pos'] = word_parse_features.apply(get_pos, axis=1)
     word_parse_features['dep num'] = word_parse_features.apply(get_dep, axis=1)
+
+
+##########################################################################################################
 
     # To obtain word lemmas
     # Get Lemma
     word_parse_features['lemma'] = word_parse_features.apply(
         lemmatiser, axis=1)
+
+
+##########################################################################################################
 
     # Apply function to get number of synonyms and hypernyms/hyponyms
     word_parse_features['synonyms'] = word_parse_features['lemma'].apply(
@@ -476,42 +544,59 @@ for x in array:
     word_parse_features['hyponyms'] = word_parse_features['lemma'].apply(
         lambda x: hyponyms(x))
 
+##########################################################################################################
+    # FINISHED
     # Apply function to check if contained in Ogden word set
     ogden = pd.read_table('binary-features/ogden.txt')
     word_parse_features['ogden'] = word_parse_features['lemma'].apply(
         lambda x: 1 if any(ogden.words == x) else 0)  # clean words
+
+##########################################################################################################
+    # TODO - Need to get this
 
     # Apply function to check if contained in simple wiki word set
     simple_wiki = pd.read_csv('binary-features/Most_Frequent.csv')
     word_parse_features['simple_wiki'] = word_parse_features['lemma'].apply(
         lambda x: 1 if any(simple_wiki.a == x) else 0)  # clean words
 
+##########################################################################################################
+    # TODO - Need to get CALD feature text
+
+    # Apply function to get the level from Cambridge Advanced Learner Dictionary
     cald = pd.read_csv('binary-features/CALD.txt')
     word_parse_features['cald'] = word_parse_features['phrase'].apply(
         lambda x: 1 if any(cald.a == x) else 0)
 
-    # Apply function to get the level from Cambridge Advanced Learner Dictionary
+##########################################################################################################
+    # TODO - Trying to track down a complete version of this database
+    # Get some MRC features
     mrc_features = pd.read_table('corpus/MRC.tsv', names=('word', 'AOA', 'BFRQ', 'CNC',
                                                           'KFCAT', 'FAM', 'KFSMP', 'IMG', 'KFFRQ', 'NLET', 'CMEAN', 'PMEAN', 'NPHN', 'T-LFRQ'))
-
-    # Get some MRC features
 
     word_parse_features['cnc'] = word_parse_features['lemma'].apply(
         lambda x: cnc(x))
     word_parse_features['img'] = word_parse_features['lemma'].apply(
         lambda x: img(x))
 
+##########################################################################################################
+    # TODO - Need to take subtitles.txt and extract most frequent x words as defined in the paper
     # Apply function to check if contained  subimdb word set
     subimdb_500 = pd.read_pickle('binary-features/subimdb_500')
     word_parse_features['sub_imdb'] = word_parse_features['lemma'].apply(
         lambda x: 1 if any(subimdb_500.words == x) else 0)
 
+##########################################################################################################
+
     # Apply function for google freq
     word_parse_features['google frequency'] = word_parse_features.apply(
         get_frequency, axis=1)
 
+##########################################################################################################
+
     word_parse_features['phrase'] = word_parse_features.phrase.astype(str)
     word_parse_features['pos'] = word_parse_features.pos.astype(str)
+
+##########################################################################################################
 
     word_parse_features['KFCAT'] = word_parse_features['lemma'].apply(
         lambda x: KFCAT_fun(x))
@@ -527,6 +612,8 @@ for x in array:
         lambda x: NPHN_fun(x))
     word_parse_features['TLFRQ'] = word_parse_features['lemma'].apply(
         lambda x: TLFRQ_fun(x))
+
+##########################################################################################################
 
     word_parse_features.to_pickle('final_run/'+x+'_actual')
 
