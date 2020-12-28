@@ -10,7 +10,7 @@
 
 function scrapePost(upperBound) {
   const selectors = {
-    post: '[aria-posinset][role="article"]',
+    post: "[class=\"lzcic4wl\"][role=\"article\"]",
     post_text: "div[data-ad-comet-preview='message']",
     comments: ".ecm0bbzt.e5nlhep0.a8c37x1j",
   };
