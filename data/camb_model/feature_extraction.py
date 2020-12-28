@@ -111,8 +111,6 @@ for x in array:
     # apply parsing to sentences
     sentences['parse'] = sentences['clean sentence'].apply(lambda x: parse(x))
 
-    sentences
-
     # Merge
     word_parse_features = pd.merge(sentences, word_features)
 
@@ -396,7 +394,6 @@ for x in array:
     def NLET_fun(word):
 
         table = mrc_features[mrc_features['word'] == word]
-
         if len(table) > 0:
 
             NLET = table['NLET'].values[0]
@@ -412,7 +409,6 @@ for x in array:
     def NPHN_fun(word):
 
         table = mrc_features[mrc_features['word'] == word]
-
         if len(table) > 0:
 
             NPHN = table['NPHN'].values[0]
@@ -428,7 +424,6 @@ for x in array:
     def TLFRQ_fun(word):
 
         table = mrc_features[mrc_features['word'] == word]
-
         if len(table) > 0:
 
             TLFRQ = table['T-LFRQ'].values[0]
@@ -443,7 +438,6 @@ for x in array:
 ##########################################################################################################
 
     # Convert tree bank tags to ones that are compatible w google
-
 
     def is_noun(tag):
         return tag in ['NN', 'NNS', 'NNP', 'NNPS']
@@ -552,7 +546,7 @@ for x in array:
         lambda x: 1 if any(ogden.words == x) else 0)  # clean words
 
 ##########################################################################################################
-    # TODO - Need to get this
+    # TODO - Have dataset, need to do some processing
 
     # Apply function to check if contained in simple wiki word set
     simple_wiki = pd.read_csv('binary-features/Most_Frequent.csv')

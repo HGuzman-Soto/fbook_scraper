@@ -43,12 +43,9 @@ wiki_test_data = pd.read_pickle('pickled-dataframes/'+x+'_test_data')
 wiki_training_data = pd.read_pickle('pickled-dataframes/'+x+'_training_data')
 wiki_test_data.name = x
 wiki_training_data.name = x
-In[40]:
 lexicon = pd.read_table('lexicon', delim_whitespace=True,
                         names=('phrase', 'score'))
-In[41]:
 lexicon['phrase'] = lexicon['phrase'].apply(lambda x: str(x).lower())
-In[4]:
 
 
 class TextSelector(BaseEstimator, TransformerMixin):
