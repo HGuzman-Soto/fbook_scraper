@@ -34,6 +34,7 @@ for x in array:
 
 
 ##########################################################################################################
+    print("begin cleaning")
     # Cleaning function for words
     remove = string.punctuation
     remove = remove.replace("-", "")
@@ -44,10 +45,14 @@ for x in array:
     word_set['phrase'] = word_set['phrase'].apply(
         lambda x: x.translate({ord(char): None for char in remove}))
 
+    print("finish cleaning", "\n")
+
 ##########################################################################################################
     # function to obtain syablles for words
     from datamuse import datamuse
     api = datamuse.Datamuse()
+
+    print("geting syllabels")
 
     def get_syllables(word):
         syllables = 0
@@ -55,6 +60,7 @@ for x in array:
         if len(word_results) > 0:
             word = word_results[0]["word"]
             syllables = int(word_results[0]["numSyllables"])
+        print("# of syllables:", syllables)
         return syllables
 
     # Apply function to get syllables
@@ -72,9 +78,11 @@ for x in array:
 
     word_features = pd.merge(words, word_set)
 
+    print('Finished getting syllabels', "\n")
+
 
 ##########################################################################################################
-
+    # TODO - Set up this
     # Now parse
     import pycorenlp
     import pandas as pd
@@ -101,6 +109,7 @@ for x in array:
 ##########################################################################################################
 
     # function to parse sentences
+
     def parse(string):
         output = nlp.annotate(string, properties={
             'annotators': 'pos,depparse',
@@ -116,7 +125,8 @@ for x in array:
 
 ##########################################################################################################
 
-    # Work out POS and dep number for words in word_parse_features
+#     # Work out POS and dep number for words in word_parse_features
+
     def get_pos(row):
         word = row['phrase']
         parse = row['parse']
@@ -130,7 +140,7 @@ for x in array:
             if comp_word == word:
                 return parse['sentences'][0]['tokens'][i]['pos']
 
-##########################################################################################################
+###########################################################################################################
 
     def get_dep(row):
         number = 0
@@ -151,6 +161,7 @@ for x in array:
 
     # Function to get the proper lemma
 
+    print("start tagging")
     from nltk.corpus import wordnet
 
     def get_wordnet_pos(treebank_tag):
@@ -166,12 +177,13 @@ for x in array:
         else:
             return None
 
+    print("finish tagging", "\n")
+
 ##########################################################################################################
 
+    print("start lemmatizing")
     from nltk.stem import WordNetLemmatizer
     wordnet_lemmatizer = WordNetLemmatizer()
-
-##########################################################################################################
 
     def lemmatiser(row):
 
@@ -187,6 +199,8 @@ for x in array:
                 return lemma
             except:
                 print(word)
+
+    print("finish lemmatizing", "\n")
 ##########################################################################################################
 
     # return MRC scores
