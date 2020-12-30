@@ -204,9 +204,11 @@ for x in array:
 ##########################################################################################################
 
     # return MRC scores
-    mrc_features = pd.read_table('corpus/MRC.tsv', names=('word', 'AOA', 'BFRQ', 'CNC',
-                                                          'KFCAT', 'FAM', 'KFSMP', 'IMG', 'KFFRQ', 'NLET', 'CMEAN', 'PMEAN', 'NPHN', 'T-LFRQ'))
+    # mrc_features = pd.read_table('corpus/MRC.tsv', names=('word', 'AOA', 'BFRQ', 'CNC',
+    #                                                       'KFCAT', 'FAM', 'KFSMP', 'IMG', 'KFFRQ', 'NLET', 'CMEAN', 'PMEAN', 'NPHN', 'T-LFRQ'))
 
+    mrc_features = pd.read_table('corpus/MRC.csv', names=('id', 'NPHN', 'KFFRQ',
+                                                          'KFCAT', 'KFSMP', 'T-LFRQ', 'FAM', 'CNC', 'IMG', 'AOA', 'word'))
 ##########################################################################################################
 
     def aoa(word):
@@ -405,18 +407,18 @@ for x in array:
 
 ##########################################################################################################
 
-    def NLET_fun(word):
+    # def NLET_fun(word):
 
-        table = mrc_features[mrc_features['word'] == word]
-        if len(table) > 0:
+    #     table = mrc_features[mrc_features['word'] == word]
+    #     if len(table) > 0:
 
-            NLET = table['NLET'].values[0]
-            NLET = int(NLET)
+    #         NLET = table['NLET'].values[0]
+    #         NLET = int(NLET)
 
-            return NLET
-        else:
-            y = 0
-            return y
+    #         return NLET
+    #     else:
+    #         y = 0
+    #         return y
 
 ##########################################################################################################
 
@@ -575,8 +577,11 @@ for x in array:
 ##########################################################################################################
     # TODO - Trying to track down a complete version of this database
     # Get some MRC features
-    mrc_features = pd.read_table('corpus/MRC.tsv', names=('word', 'AOA', 'BFRQ', 'CNC',
-                                                          'KFCAT', 'FAM', 'KFSMP', 'IMG', 'KFFRQ', 'NLET', 'CMEAN', 'PMEAN', 'NPHN', 'T-LFRQ'))
+    # mrc_features = pd.read_table('corpus/MRC.tsv', names=('word', 'AOA', 'BFRQ', 'CNC',
+    #                                                       'KFCAT', 'FAM', 'KFSMP', 'IMG', 'KFFRQ', 'NLET', 'CMEAN', 'PMEAN', 'NPHN', 'T-LFRQ'))
+
+    mrc_features = pd.read_table('corpus/MRC.csv', names=('id', 'NPHN', 'KFFRQ',
+                                                          'KFCAT', 'KFSMP', 'T-LFRQ', 'FAM', 'CNC', 'IMG', 'AOA', 'word'))
 
     word_parse_features['cnc'] = word_parse_features['lemma'].apply(
         lambda x: cnc(x))
@@ -611,8 +616,8 @@ for x in array:
         lambda x: KFSMP_fun(x))
     word_parse_features['KFFRQ'] = word_parse_features['lemma'].apply(
         lambda x: KFFRQ_fun(x))
-    word_parse_features['NLET'] = word_parse_features['lemma'].apply(
-        lambda x: NLET_fun(x))
+    # word_parse_features['NLET'] = word_parse_features['lemma'].apply(
+    #     lambda x: NLET_fun(x))
     word_parse_features['NPHN'] = word_parse_features['lemma'].apply(
         lambda x: NPHN_fun(x))
     word_parse_features['TLFRQ'] = word_parse_features['lemma'].apply(
