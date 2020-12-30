@@ -539,16 +539,13 @@ for x in array:
         lambda x: hyponyms(x))
 
 ##########################################################################################################
-    # FINISHED
-    # Apply function to check if contained in Ogden word set
+
     ogden = pd.read_table('binary-features/ogden.txt')
     word_parse_features['ogden'] = word_parse_features['lemma'].apply(
         lambda x: 1 if any(ogden.words == x) else 0)  # clean words
 
 ##########################################################################################################
-    # TODO - Have dataset, need to do some processing
 
-    # Apply function to check if contained in simple wiki word set
     simple_wiki = pd.read_csv('binary-features/Most_Frequent.csv')
     word_parse_features['simple_wiki'] = word_parse_features['lemma'].apply(
         lambda x: 1 if any(simple_wiki.a == x) else 0)  # clean words
@@ -573,9 +570,9 @@ for x in array:
         lambda x: img(x))
 
 ##########################################################################################################
-    # TODO - Need to take subtitles.txt and extract most frequent x words as defined in the paper
-    # Apply function to check if contained  subimdb word set
-    subimdb_500 = pd.read_pickle('binary-features/subimdb_500')
+
+    # subimdb_500 = pd.read_pickle('binary-features/subimdb_500')
+    subimdb_500 = pd.read_csv('binary-features/subimbd_500.csv')
     word_parse_features['sub_imdb'] = word_parse_features['lemma'].apply(
         lambda x: 1 if any(subimdb_500.words == x) else 0)
 
