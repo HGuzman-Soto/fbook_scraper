@@ -87,13 +87,17 @@ for x in array:
     import pycorenlp
     import pandas as pd
     from pycorenlp import StanfordCoreNLP
+    print("start core")
     nlp = StanfordCoreNLP('http://localhost:9000')
 
     sentences = data_frame[['sentence', 'ID']].copy()
 
     sentences = sentences.drop_duplicates()
 
+    print("end core")
+
 ##########################################################################################################
+    print("start first token")
 
     def removefirsttoken(x):
         x = x.split(' ', 1)[1]
@@ -106,9 +110,11 @@ for x in array:
     else:
         sentences['clean sentence'] = sentences['sentence']
 
+    print("start end token")
 ##########################################################################################################
 
     # function to parse sentences
+    print("start parse sentence")
 
     def parse(string):
         output = nlp.annotate(string, properties={
@@ -123,6 +129,7 @@ for x in array:
     # Merge
     word_parse_features = pd.merge(sentences, word_features)
 
+    print("finish parsing sentence")
 ##########################################################################################################
 
 #     # Work out POS and dep number for words in word_parse_features
@@ -130,15 +137,26 @@ for x in array:
     def get_pos(row):
         word = row['phrase']
         parse = row['parse']
-        for i in range(len(parse['sentences'][0]['tokens'])):
 
-            comp_word = parse['sentences'][0]['tokens'][i]['word']
-            comp_word = comp_word.lower()
-            comp_word = comp_word.translate(
-                {ord(char): None for char in remove})
+        print("word", word)
+        print("parse", parse)
 
-            if comp_word == word:
-                return parse['sentences'][0]['tokens'][i]['pos']
+        try:
+
+            # print("check", parse['sentences'][0]['tokens'])
+            for i in range(len(parse['sentences'][0]['tokens'])):
+
+                comp_word = parse['sentences'][0]['tokens'][i]['word']
+                comp_word = comp_word.lower()
+                comp_word = comp_word.translate(
+                    {ord(char): None for char in remove})
+
+                if comp_word == word:
+                    print("proper", parse['sentences'][0]['tokens'][i]['pos'])
+                    print(type(parse['sentences'][0]['tokens'][i]['pos']))
+                    return parse['sentences'][0]['tokens'][i]['pos']
+        except:
+            return "NN"
 
 ###########################################################################################################
 
@@ -146,16 +164,22 @@ for x in array:
         number = 0
         word = row['phrase']
         parse = row['parse']
-        for i in range(len(parse['sentences'][0]['basicDependencies'])):
-            comp_word = parse['sentences'][0]['basicDependencies'][i]['governorGloss']
-            comp_word = comp_word.lower()
-            comp_word = comp_word.translate(
-                {ord(char): None for char in remove})
 
-            if comp_word == word:
-                number += 1
+        try:
+            for i in range(len(parse['sentences'][0]['basicDependencies'])):
+                comp_word = parse['sentences'][0]['basicDependencies'][i]['governorGloss']
+                comp_word = comp_word.lower()
+                comp_word = comp_word.translate(
+                    {ord(char): None for char in remove})
 
-        return number
+                if comp_word == word:
+                    number += 1
+                print("proper dp", number)
+                return number
+
+        except:
+            return 0
+
 
 ##########################################################################################################
 
@@ -305,23 +329,23 @@ for x in array:
 ##########################################################################################################
 
     # return CEFR levels
-    all_levels = pd.read_table(
-        'corpus/CEFR_levels.tsv', names=('word', 'level'))
+    # all_levels = pd.read_table(
+    #     'corpus/CEFR_levels.tsv', names=('word', 'level'))
 
-    def levels(word):
-        word = ''.join(word.split()).lower()
-        try:
-            df = all_levels.loc[all_levels['word'] == word]
-            level = df.iloc[0]['level']
-            return level
+    # def levels(word):
+    #     word = ''.join(word.split()).lower()
+    #     try:
+    #         df = all_levels.loc[all_levels['word'] == word]
+    #         level = df.iloc[0]['level']
+    #         return level
 
-        except:
-            try:
-                df = all_levels.loc[all_levels['word'] == word]
-                level = df.iloc[0]['level']
-                return level
-            except:
-                return 0
+    #     except:
+    #         try:
+    #             df = all_levels.loc[all_levels['word'] == word]
+    #             level = df.iloc[0]['level']
+    #             return level
+    #         except:
+    #             return 0
 
 ##########################################################################################################
 
@@ -455,6 +479,7 @@ for x in array:
 
     # Convert tree bank tags to ones that are compatible w google
 
+
     def is_noun(tag):
         return tag in ['NN', 'NNS', 'NNP', 'NNPS']
 
@@ -532,9 +557,15 @@ for x in array:
 ##########################################################################################################
 
     # GET DEP AND POS NUMBER
+    print("start get pos")
     word_parse_features['pos'] = word_parse_features.apply(get_pos, axis=1)
+    print("end get pos")
+
+    print("start get dep")
+
     word_parse_features['dep num'] = word_parse_features.apply(get_dep, axis=1)
 
+    print("end get dep")
 
 ##########################################################################################################
 
@@ -547,32 +578,40 @@ for x in array:
 ##########################################################################################################
 
     # Apply function to get number of synonyms and hypernyms/hyponyms
+    print("get syn, hyper, hypo")
     word_parse_features['synonyms'] = word_parse_features['lemma'].apply(
         lambda x: synonyms(x))
     word_parse_features['hypernyms'] = word_parse_features['lemma'].apply(
         lambda x: hypernyms(x))
     word_parse_features['hyponyms'] = word_parse_features['lemma'].apply(
         lambda x: hyponyms(x))
+    print("end syn, hyper, hypo")
+
 
 ##########################################################################################################
 
     ogden = pd.read_table('binary-features/ogden.txt')
+    print("start  ogden")
     word_parse_features['ogden'] = word_parse_features['lemma'].apply(
         lambda x: 1 if any(ogden.words == x) else 0)  # clean words
+    print("end ogden")
+
 
 ##########################################################################################################
 
     simple_wiki = pd.read_csv('binary-features/Most_Frequent.csv')
+    print("start simple_wiki")
     word_parse_features['simple_wiki'] = word_parse_features['lemma'].apply(
         lambda x: 1 if any(simple_wiki.a == x) else 0)  # clean words
 
+    print("end simple_wiki")
 ##########################################################################################################
     # TODO - Need to get CALD feature text
 
-    # Apply function to get the level from Cambridge Advanced Learner Dictionary
-    cald = pd.read_csv('binary-features/CALD.txt')
-    word_parse_features['cald'] = word_parse_features['phrase'].apply(
-        lambda x: 1 if any(cald.a == x) else 0)
+    # # Apply function to get the level from Cambridge Advanced Learner Dictionary
+    # cald = pd.read_csv('binary-features/CALD.txt')
+    # word_parse_features['cald'] = word_parse_features['phrase'].apply(
+    #     lambda x: 1 if any(cald.a == x) else 0)
 
 ##########################################################################################################
     # TODO - Trying to track down a complete version of this database
@@ -582,32 +621,44 @@ for x in array:
 
     mrc_features = pd.read_table('corpus/MRC.csv', names=('id', 'NPHN', 'KFFRQ',
                                                           'KFCAT', 'KFSMP', 'T-LFRQ', 'FAM', 'CNC', 'IMG', 'AOA', 'word'))
-
+    print("get mrc cnc and img")
     word_parse_features['cnc'] = word_parse_features['lemma'].apply(
         lambda x: cnc(x))
     word_parse_features['img'] = word_parse_features['lemma'].apply(
         lambda x: img(x))
 
+    print("end mrc cnc and img")
+
+
 ##########################################################################################################
 
     # subimdb_500 = pd.read_pickle('binary-features/subimdb_500')
     subimdb_500 = pd.read_csv('binary-features/subimbd_500.csv')
+    print("get subimbd")
     word_parse_features['sub_imdb'] = word_parse_features['lemma'].apply(
         lambda x: 1 if any(subimdb_500.words == x) else 0)
+
+    print("end get submimd")
 
 ##########################################################################################################
 
     # Apply function for google freq
+    print("get google frequency")
     word_parse_features['google frequency'] = word_parse_features.apply(
         get_frequency, axis=1)
+    print("end google frequency")
 
 ##########################################################################################################
 
+    print("start convert phrase and pos to string")
     word_parse_features['phrase'] = word_parse_features.phrase.astype(str)
     word_parse_features['pos'] = word_parse_features.pos.astype(str)
+    print("end convert phrase and pos to string")
+
 
 ##########################################################################################################
 
+    print('get rest of mrc')
     word_parse_features['KFCAT'] = word_parse_features['lemma'].apply(
         lambda x: KFCAT_fun(x))
     word_parse_features['FAM'] = word_parse_features['lemma'].apply(
@@ -622,6 +673,8 @@ for x in array:
         lambda x: NPHN_fun(x))
     word_parse_features['TLFRQ'] = word_parse_features['lemma'].apply(
         lambda x: TLFRQ_fun(x))
+
+    print('end rest of mrc')
 
 ##########################################################################################################
 

@@ -155,10 +155,12 @@ n_gram_freq = Pipeline([
     ('standard', StandardScaler())
 ])
 
-cald = Pipeline([
-                ('selector', NumberSelector(key='cald')),
-                ('standard', StandardScaler())
-                ])
+# cald = Pipeline([
+#                 ('selector', NumberSelector(key='cald')),
+#                 ('standard', StandardScaler())
+#                 ])
+
+
 aoa = Pipeline([
     ('selector', NumberSelector(key='aoa')),
     ('standard', StandardScaler())
@@ -202,7 +204,7 @@ feats = FeatureUnion([  # ('ff',first_fixation),
     ('freq', frequency),
     ('subimdb', subimdb),
     # ('n_gram_freq',n_gram_freq),
-    ('cald', cald),
+    # ('cald', cald),
     ('aoa', aoa),
     ('conc', conc),
     ('fam', fam),
