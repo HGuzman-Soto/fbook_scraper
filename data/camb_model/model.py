@@ -21,31 +21,36 @@ import numpy as np
 # import feature frames
 
 import pandas as pd
+import sys
 
-x = 'Wikipedia'
 
-wikipedia_test_data = pd.read_pickle('pickled-dataframes/'+x+'_test_data')
-wikipedia_training_data = pd.read_pickle(
-    'pickled-dataframes/'+x+'_training_data')
-wikipedia_test_data.name = x
-wikipedia_training_data.name = x
+# x = 'Wikipedia'
 
-x = 'News'
+# # wikipedia_test_data = pd.read_pickle('pickled-dataframes/'+x+'_test_data')
+# # wikipedia_training_data = pd.read_pickle(
+# #     'pickled-dataframes/'+x+'_training_data')
+# wikipedia_test_data = pd.read_csv('actual-test-sets/'+x+'_Test.tsv')
+# wikipedia_training_data = pd.read_pickle(
+#     'actual-test-sets/'+x+'_Train.tsv')
+# wikipedia_test_data.name = x
+# wikipedia_training_data.name = x
 
-news_test_data = pd.read_pickle('pickled-dataframes/'+x+'_test_data')
-news_training_data = pd.read_pickle('pickled-dataframes/'+x+'_training_data')
-news_test_data.name = 'News'
-news_training_data.name = 'News'
+# x = 'News'
+
+# news_test_data = pd.read_pickle('pickled-dataframes/'+x+'_test_data')
+# news_training_data = pd.read_pickle('pickled-dataframes/'+x+'_training_data')
+# news_test_data.name = 'News'
+# news_training_data.name = 'News'
 
 x = 'WikiNews'
 
-wiki_test_data = pd.read_pickle('pickled-dataframes/'+x+'_test_data')
-wiki_training_data = pd.read_pickle('pickled-dataframes/'+x+'_training_data')
+wiki_test_data = pd.read_pickle('final_run/WikiNews_Test_actual')
+wiki_training_data = pd.read_pickle('final_run/WikiNews_Train_actual')
 wiki_test_data.name = x
 wiki_training_data.name = x
-lexicon = pd.read_table('lexicon', delim_whitespace=True,
-                        names=('phrase', 'score'))
-lexicon['phrase'] = lexicon['phrase'].apply(lambda x: str(x).lower())
+# lexicon = pd.read_table('lexicon', delim_whitespace=True,
+#                         names=('phrase', 'score'))
+# lexicon['phrase'] = lexicon['phrase'].apply(lambda x: str(x).lower())
 
 
 class TextSelector(BaseEstimator, TransformerMixin):
@@ -161,31 +166,31 @@ n_gram_freq = Pipeline([
 #                 ])
 
 
-aoa = Pipeline([
-    ('selector', NumberSelector(key='aoa')),
-    ('standard', StandardScaler())
-])
-conc = Pipeline([
-                ('selector', NumberSelector(key='conc')),
-                ('standard', StandardScaler())
-                ])
-fam = Pipeline([
-    ('selector', NumberSelector(key='fam')),
-    ('standard', StandardScaler())
-])
+# aoa = Pipeline([
+#     ('selector', NumberSelector(key='aoa')),
+#     ('standard', StandardScaler())
+# ])
+# conc = Pipeline([
+#                 ('selector', NumberSelector(key='conc')),
+#                 ('standard', StandardScaler())
+#                 ])
+# fam = Pipeline([
+#     ('selector', NumberSelector(key='fam')),
+#     ('standard', StandardScaler())
+# ])
 img = Pipeline([
     ('selector', NumberSelector(key='img')),
     ('standard', StandardScaler())
 ])
-phon = Pipeline([
-                ('selector', NumberSelector(key='phon')),
-                ('standard', StandardScaler())
-                ])
+# phon = Pipeline([
+#                 ('selector', NumberSelector(key='phon')),
+#                 ('standard', StandardScaler())
+#                 ])
 
-score = Pipeline([
-    ('selector', NumberSelector(key='score')),
-    ('standard', StandardScaler())
-])
+# score = Pipeline([
+#     ('selector', NumberSelector(key='score')),
+#     ('standard', StandardScaler())
+# ])
 
 
 global feats
@@ -205,25 +210,27 @@ feats = FeatureUnion([  # ('ff',first_fixation),
     ('subimdb', subimdb),
     # ('n_gram_freq',n_gram_freq),
     # ('cald', cald),
-    ('aoa', aoa),
-    ('conc', conc),
-    ('fam', fam),
+    # ('aoa', aoa),
+    # ('conc', conc),
+    # ('fam', fam),
     ('img', img),
-    ('phon', phon),
-    ('score', score)
+    # ('phon', phon),
+    # ('score', score)
 ])
 
-frames = [news_training_data, wikipedia_training_data, wiki_training_data]
+# frames = [news_training_data, wikipedia_training_data, wiki_training_data]
+frames = [wiki_training_data]
 total_training = pd.concat(frames)
 
-frames = [wikipedia_test_data, wiki_test_data, news_test_data]
+# frames = [wikipedia_test_data, wiki_test_data, news_test_data]
+frames = [wiki_test_data]
 total_test = pd.concat(frames)
 
-total_training = pd.merge(total_training, lexicon, on='phrase', how='left')
-total_training.fillna(0.0, inplace=True)
+# total_training = pd.merge(total_training, lexicon, on='phrase', how='left')
+# total_training.fillna(0.0, inplace=True)
 
-total_test = pd.merge(total_test, lexicon, on='phrase', how='left')
-total_test.fillna(0.0, inplace=True)
+# total_test = pd.merge(total_test, lexicon, on='phrase', how='left')
+# total_test.fillna(0.0, inplace=True)
 
 training_data = total_training
 train_targets = training_data['complex_binary'].values
@@ -252,6 +259,9 @@ def apply_algorithm(array):
 
         test_data = x
         test_targets = test_data['complex_binary'].values
+        print(test_data)
+        df = pd.DataFrame(data=test_data)
+        df.to_csv('work.csv', index=False)
 
         test_predictions = pipeline.predict(test_data)
 
@@ -261,13 +271,28 @@ def apply_algorithm(array):
         F_Score = f1_score(test_targets, test_predictions)
 
         model_stats.loc[len(model_stats)] = [i, (str(model))[
-            :60], precision, recall, F_Score]
+            :100], precision, recall, F_Score]
         # baseline_accuracies(test_targets)
 
 
+def fbook(fbook_data):
+    test_predictions = pipeline.predict(fbook_data)
+    print(test_predictions)
+    print(type(test_predictions))
+
+    df = pd.DataFrame(data=test_predictions)
+    df.to_csv('mock.csv', index=False)
+
+
 apply_algorithm([total_test])  # with lexicon
-model_stats
+print(model_stats)
 
 
-apply_algorithm([total_test])  # without lexicon
-model_stats
+fbook_data = pd.read_pickle('final_run/test_data')
+fbook_data.to_csv('another.csv', index=False)
+print(fbook_data.head())
+fbook(fbook_data)
+
+
+# apply_algorithm([total_test])  # without lexicon
+# model_stats

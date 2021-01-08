@@ -3,8 +3,7 @@ import pandas as pd
 
 df = pd.read_csv('data.csv')
 
-column_names = ['id', 'sentence', 'start', 'end', 'word']
-df = df.reindex(columns=column_names)
+df = df[['id', 'text', 'starting_index', 'ending_index', 'content_word']]
 print(df.head())
 
-df.to_csv('test_data.tsv', header=False, sep='\t')
+df.to_csv('test_data.csv', index=False)
