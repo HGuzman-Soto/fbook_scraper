@@ -30,7 +30,6 @@ Steps
 
 """
 
-#if __name__ == "__main__":
 df['clean_text'] = df.text.apply(lambda x: clean(x))
 
 df = df[df.clean_text.apply(lambda x: isValuableComment(x)) == True]
