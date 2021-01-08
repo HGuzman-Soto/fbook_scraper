@@ -12,13 +12,14 @@ import regex as re
 
 Wikinews = True
 
-array = ['WikiNews_Train', 'WikiNews_Test']
+# array = ['WikiNews_Train', 'WikiNews_Test', 'test_data.tsv']
+array = ['test_data.tsv']
 
 for x in array:
 
-    location = 'actual-test-sets/'+x+'.tsv'
-    data_frame = pd.read_table(location, names=('ID', 'sentence', 'start_index', 'end_index', 'phrase', 'total_native',
-                                                'total_non_native', 'native_complex', 'non_native_complex', 'complex_binary', 'complex_probabilistic'))
+    # location = 'actual-test-sets/'+x+'.tsv'
+    data_frame = pd.read_table(x, names=('ID', 'sentence', 'start_index', 'end_index', 'phrase', 'total_native',
+                                         'total_non_native', 'native_complex', 'non_native_complex', 'complex_binary', 'complex_probabilistic'))
 
     data_frame['split'] = data_frame['phrase'].apply(lambda x: x.split())
 
@@ -478,7 +479,6 @@ for x in array:
 ##########################################################################################################
 
     # Convert tree bank tags to ones that are compatible w google
-
 
     def is_noun(tag):
         return tag in ['NN', 'NNS', 'NNP', 'NNPS']

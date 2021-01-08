@@ -24,7 +24,6 @@ Steps
 
 """
 
-df = df[100:120]
 df['clean_text'] = df.text.apply(lambda x: clean(x))
 
 df = df[df.clean_text.apply(lambda x: isValuableComment(x)) == True]
