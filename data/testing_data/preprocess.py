@@ -162,7 +162,7 @@ def clean(text):
         return text
 
     # remove see more
-    text = re.sub(r' ?\w*?[…]see more', '', text, flags=re.I)
+    text = re.sub(r'[…] ?see more', '', text, flags=re.I)
 
     # remove urls
     text = re.sub(r'http:?\S+|www.\S+', '', text)
