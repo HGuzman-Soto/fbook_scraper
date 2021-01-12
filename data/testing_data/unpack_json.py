@@ -133,7 +133,8 @@ def main():
     else:
         df.to_csv('temp_data.csv', index=False)
 
-    os.remove(json_file)
+    shutil.move(json_file,
+                "json_files/")
 
 
 if __name__ == "__main__":
