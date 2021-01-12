@@ -4,6 +4,7 @@ import re
 import collections
 from collections import Counter
 
+
 """For simple wikipedia
 
 1) Convert text file to csv, set columns to [word,paragraph,sentence]
