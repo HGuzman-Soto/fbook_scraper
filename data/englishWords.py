@@ -7,19 +7,20 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 
+#scrape all base words and levels from website
 url = 'http://englishprofile.org/american-english'
 path="C:\\Users\\hanna\\Downloads\\geckodriver-v0.28.0-win64"
 driver = webdriver.Firefox(path)
 driver.get(url)
 select = Select(driver.find_element_by_id('limit'))
 select.select_by_visible_text('All')
-time.sleep(20) #could possibly change this to a wait ?
+time.sleep(20) #could possibly change this to a wait, need delay to load all options on page
 wordsandlevels = []
 page_source = driver.page_source
 soup = BeautifulSoup(page_source, 'html.parser')
 allwords = soup.findAll('tr')
 completeWords = allwords[1:]
-print(len(completeWords))
+#extract word and label from scraped data
 for word in completeWords :
     element = list(word)
     #extract word out of html
@@ -37,6 +38,24 @@ for word in completeWords :
     label = resultLabel[7:9]
     wordlist = [newWord, label]
     wordsandlevels.append(wordlist)
-print(wordsandlevels[5])
+
+#convert label to number 1-6
+for labelList in wordsandlevels :
+    oldLabel = labelList[1]
+    if(oldLabel == 'A1') :
+        newLabel = 1
+    elif (oldLabel == 'A2') :
+        newLabel = 2
+    elif (oldLabel == 'B1') :
+        newLabel = 3
+    elif (oldLabel == 'B2') :
+        newLabel = 4
+    elif (oldLabel == 'C1') :
+        newLabel = 5
+    else :
+        newLabel = 6
+    labelList[1] = newLabel
+
+#convert to csv file
 df = pd.DataFrame(wordsandlevels, columns = ['Word', 'Level'])
 df.to_csv('wordsandlevels.csv', index=False)
