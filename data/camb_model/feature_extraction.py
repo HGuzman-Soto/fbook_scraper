@@ -118,7 +118,7 @@ for x in array:
 
     sentences = data_frame[['sentence', 'ID']].copy()
 
-    sentences = sentences.drop_duplicates()
+    # sentences = sentences.drop_duplicates()
 
     print("end core")
 
@@ -207,9 +207,9 @@ for x in array:
                     print("proper dp", number)
                 except:
                     pass
-                return number
+            return number
         except:
-            return 0
+            pass
 
 
 ##########################################################################################################
