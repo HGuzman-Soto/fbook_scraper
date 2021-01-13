@@ -30,11 +30,11 @@ if __name__ == "__main__":
     if (args.all == 1):
         array = ['WikiNews_Train', 'WikiNews_Test', 'News_Train',
                  'News_Test', 'Wikipedia_Train', 'Wikipedia_Test']
-    elif (args.wikipedia == 1):
+    if (args.wikipedia == 1):
         array += ['Wikipedia_Train', 'Wikipedia_Test']
-    elif (args.wikinews == 1):
+    if (args.wikinews == 1):
         array += 'WikiNews_Train', 'WikiNews_Test'
-    elif (args.news == 1):
+    if (args.news == 1):
         array += 'News_Train', 'News_Test'
     elif (args.test == 1):
         array = ['testing_data.tsv']
@@ -118,7 +118,7 @@ for x in array:
 
     sentences = data_frame[['sentence', 'ID']].copy()
 
-    sentences = sentences.drop_duplicates()
+    # sentences = sentences.drop_duplicates()
 
     print("end core")
 

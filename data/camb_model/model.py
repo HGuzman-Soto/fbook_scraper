@@ -17,38 +17,99 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.base import BaseEstimator, TransformerMixin
 import string
 import numpy as np
+import argparse
 import pandas as pd
 import sys
 
 ##########################################################################################################
 
-x = 'Wikipedia'
+"""
+Todo
 
-wikipedia_test_data = pd.read_pickle('features/Wikipedia_Test_allInfo')
-wikipedia_training_data = pd.read_pickle('features/Wikipedia_Train_allInfo')
-wikipedia_test_data.name = x
-wikipedia_training_data.name = x
+1) Think about where/how to save models (wandb)
+2) Right now parser args not super clean. Basically you've got the option to train on all or whichever you want
+But the options for which your evaluating is not super clear. My assumption (since camb shows performance best with all datasets)
+is that you'll train on all three. So if you choose test, we'll train on all of them
 
-x = 'News'
-
-news_test_data = pd.read_pickle('features/News_Test_allInfo')
-news_training_data = pd.read_pickle('features/News_Train_allInfo')
-news_test_data.name = 'News'
-news_training_data.name = 'News'
-
-x = 'WikiNews'
-
-wiki_test_data = pd.read_pickle('features/WikiNews_Test_allInfo')
-wiki_training_data = pd.read_pickle('features/WikiNews_Train_allInfo')
-wiki_test_data.name = x
-wiki_training_data.name = x
+"""
 
 
-# I think this lexicon is in reference to the 2017 wu paper?
-# Or their may be a part that has to do with phrases here
-# lexicon = pd.read_table('lexicon', delim_whitespace=True,
-#                         names=('phrase', 'score'))
-# lexicon['phrase'] = lexicon['phrase'].apply(lambda x: str(x).lower())
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Run feature extraction')
+    parser.add_argument('--all', '-a', type=int, default=0)
+    parser.add_argument('--wikipedia', '-w', type=int, default=0)
+    parser.add_argument('--wikinews', '-i', type=int, default=0)
+    parser.add_argument('--news', '-n', type=int, default=0)
+    parser.add_argument('--test', '-t', type=int, default=0)
+
+    train_frames = []
+    test_frames = []
+    args = parser.parse_args()
+    if (args.all == 1):
+        wikipedia_test_data = pd.read_pickle('features/Wikipedia_Test_allInfo')
+        wikipedia_training_data = pd.read_pickle(
+            'features/Wikipedia_Train_allInfo')
+        wikipedia_test_data.name = 'Wikipedia'
+        wikipedia_training_data.name = 'Wikipedia'
+
+        wiki_test_data = pd.read_pickle('features/WikiNews_Test_allInfo')
+        wiki_training_data = pd.read_pickle('features/WikiNews_Train_allInfo')
+        wiki_test_data.name = 'WikiNews'
+        wiki_training_data.name = 'WikiNews'
+
+        news_test_data = pd.read_pickle('features/News_Test_allInfo')
+        news_training_data = pd.read_pickle('features/News_Train_allInfo')
+        news_test_data.name = 'News'
+        news_training_data.name = 'News'
+
+        train_frames = [wikipedia_test_data, wiki_test_data, news_test_data]
+
+    if (args.wikipedia == 1):
+        wikipedia_test_data = pd.read_pickle('features/Wikipedia_Test_allInfo')
+        wikipedia_training_data = pd.read_pickle(
+            'features/Wikipedia_Train_allInfo')
+        wikipedia_test_data.name = 'Wikipedia'
+        wikipedia_training_data.name = 'Wikipedia'
+        test_frames += wikipedia_test_data
+
+    if (args.wikinews == 1):
+        wiki_test_data = pd.read_pickle('features/WikiNews_Test_allInfo')
+        wiki_training_data = pd.read_pickle('features/WikiNews_Train_allInfo')
+        wiki_test_data.name = 'WikiNews'
+        wiki_training_data.name = 'WikiNews'
+        test_frames += wiki_training_data
+
+    if (args.news == 1):
+        news_test_data = pd.read_pickle('features/News_Test_allInfo')
+        news_training_data = pd.read_pickle('features/News_Train_allInfo')
+        news_test_data.name = 'News'
+        news_training_data.name = 'News'
+        test_frames += news_test_data
+
+    elif (args.test == 1):
+        testing_data = pd.read_pickle('features/testing_data_allInfo')
+        testing_data.name = 'testing'
+        test_frames = [testing_data]
+
+    # I think this lexicon is in reference to the 2017 wu paper?
+    # Or their may be a part that has to do with phrases here
+    # lexicon = pd.read_table('lexicon', delim_whitespace=True,
+    #                         names=('phrase', 'score'))
+    # lexicon['phrase'] = lexicon['phrase'].apply(lambda x: str(x).lower())
+
+    total_training = pd.concat(train_frames)
+
+    total_test = pd.concat(test_frames)
+
+    # total_training = pd.merge(total_training, lexicon, on='phrase', how='left')
+    total_training.fillna(0.0, inplace=True)
+
+    # total_test = pd.merge(total_test, lexicon, on='phrase', how='left')
+    total_test.fillna(0.0, inplace=True)
+
+    training_data = total_training
+    train_targets = training_data['complex_binary'].values
+
 
 ##########################################################################################################
 
@@ -161,10 +222,10 @@ subimdb = Pipeline([
 #     ('standard', StandardScaler())
 # ])
 
-# cald = Pipeline([
-#                 ('selector', NumberSelector(key='cald')),
-#                 ('standard', StandardScaler())
-#                 ])
+cald = Pipeline([
+                ('selector', NumberSelector(key='cald')),
+                ('standard', StandardScaler())
+                ])
 
 
 aoa = Pipeline([
@@ -207,11 +268,11 @@ feats = FeatureUnion([  # ('ff',first_fixation),
     ('Syllables', syllables),
     ('ogden', ogden),
     ('simple_wiki', simple_wiki),
-    #('origin', origin),
+    # ('origin', origin),
     ('freq', frequency),
     ('subimdb', subimdb),
     # ('n_gram_freq', n_gram_freq),
-    # ('cald', cald),
+    ('cald', cald),
     ('aoa', aoa),
     ('cnc', conc),
     ('FAM', fam),
@@ -220,24 +281,6 @@ feats = FeatureUnion([  # ('ff',first_fixation),
     # ('score', score)
 ])
 
-##########################################################################################################
-
-# frames = [news_training_data, wikipedia_training_data, wiki_training_data]
-frames = [wiki_training_data]
-total_training = pd.concat(frames)
-
-# frames = [wikipedia_test_data, wiki_test_data, news_test_data]
-frames = [wiki_test_data]
-total_test = pd.concat(frames)
-
-# total_training = pd.merge(total_training, lexicon, on='phrase', how='left')
-# total_training.fillna(0.0, inplace=True)
-
-# total_test = pd.merge(total_test, lexicon, on='phrase', how='left')
-# total_test.fillna(0.0, inplace=True)
-
-training_data = total_training
-train_targets = training_data['complex_binary'].values
 
 ##########################################################################################################
 
