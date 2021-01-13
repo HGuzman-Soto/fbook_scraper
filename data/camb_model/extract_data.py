@@ -3,7 +3,8 @@ import pandas as pd
 import re
 import collections
 from collections import Counter
-
+from nltk.corpus import stopwords
+stop = stopwords.words('english')
 
 """For simple wikipedia
 
@@ -25,11 +26,13 @@ I just manually label the first colummn as word
 
 def simple_wiki():
     colnames = ['word', 'paragraph', 'sentence']
-    df_wiki = pd.read_table('camb_model/corpus/simple.txt',
+    df_wiki = pd.read_table('corpus/simple.txt',
                             names=colnames, header=None)
 
-    series_top = pd.Series(
-        " ".join((df_wiki.word).str.lower()).split()).value_counts()
+    df_wiki['word'] = df_wiki['word'].apply(
+        lambda x: x if x.lower() not in stop else x)
+    print(df_wiki.word)
+    series_top = pd.Series(df_wiki.word.value_counts())
 
     df_top = series_top.to_frame(name="frequency")
     print(df_top)
@@ -54,13 +57,18 @@ For subtitles
 def subtitles():
 
     words = re.findall(
-        '\w+', open('camb_model/binary-features/subtitles.txt').read().lower())
+        '\w+', open('binary-features/subtitles.txt').read().lower())
 
     word_dict = collections.Counter(words)
-    df = pd.DataFrame.from_dict(
-        word_dict, orient='index', columns=['frequency'])
+    df = pd.concat({k: pd.Series(v)
+                    for k, v in word_dict.items()}).reset_index()
+    df.columns = ['word', 'index', 'frequency']
 
+    print(df)
     # filter and keep top 1000 word frequency
+    df['word'] = df.word.apply(
+        lambda x: [x if x.lower() not in stop else x])
+
     df_top = df.nlargest(6386, 'frequency')
     print(df_top)
 
@@ -68,5 +76,5 @@ def subtitles():
     df_top.to_csv("subtitles.csv", index=True)
 
 
-simple_wiki()
+# simple_wiki()
 subtitles()
