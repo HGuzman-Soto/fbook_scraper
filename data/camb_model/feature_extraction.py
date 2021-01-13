@@ -100,7 +100,7 @@ for x in array:
 
     sentences = data_frame[['sentence', 'ID']].copy()
 
-    # sentences = sentences.drop_duplicates()
+    sentences = sentences.drop_duplicates()
 
     print("end core")
 
@@ -334,26 +334,6 @@ for x in array:
         except:
             return hyponyms
 
-##########################################################################################################
-
-    # return CEFR levels
-    # all_levels = pd.read_table(
-    #     'corpus/CEFR_levels.tsv', names=('word', 'level'))
-
-    # def levels(word):
-    #     word = ''.join(word.split()).lower()
-    #     try:
-    #         df = all_levels.loc[all_levels['word'] == word]
-    #         level = df.iloc[0]['level']
-    #         return level
-
-    #     except:
-    #         try:
-    #             df = all_levels.loc[all_levels['word'] == word]
-    #             level = df.iloc[0]['level']
-    #             return level
-    #         except:
-    #             return 0
 
 ##########################################################################################################
 
@@ -529,7 +509,7 @@ for x in array:
             frequency = float(frequency)
 
             if tag in tag_list:
-                print("frequency:", frequency)
+                print("frequency_1:", frequency)
                 return frequency
             else:
                 lemma = row['lemma']
@@ -542,7 +522,7 @@ for x in array:
                     frequency = float(frequency)
 
                     if tag in tag_list:
-                        print("frequency:", frequency)
+                        print("frequency_2:", frequency)
                         return frequency
                     else:
                         print("nofreq")
@@ -606,12 +586,11 @@ for x in array:
 
     print("end simple_wiki")
 ##########################################################################################################
-    # TODO - Need to get CALD feature text
 
     # # Apply function to get the level from Cambridge Advanced Learner Dictionary
-    # cald = pd.read_csv('binary-features/CALD.txt')
-    # word_parse_features['cald'] = word_parse_features['phrase'].apply(
-    #     lambda x: 1 if any(cald.a == x) else 0)
+    cald = pd.read_csv('binary-features/CALD.csv')
+    word_parse_features['cald'] = word_parse_features['phrase'].apply(
+        lambda x: cald.Level if any(cald.Level == x) else 0)
 
 ##########################################################################################################
     mrc_features = pd.read_csv('corpus/MRC.csv')
