@@ -88,7 +88,12 @@ def find_index_cw(clean_text, content_word):
     word_tuple = {}
     content_word_str = str(content_word)
     match = re.search(content_word_str, clean_text)
-    indexes = match.span()
+
+    try:
+        indexes = match.span()
+    except:
+        # change to just get rid of this entry
+        return pd.Series([math.nan, math.nan])
     return pd.Series([int(indexes[0]), int(indexes[1])])
 
 
@@ -162,7 +167,7 @@ def clean(text):
         return text
 
     # remove see more
-    text = re.sub(r' ?\w*?[…]see more', '', text, flags=re.I)
+    text = re.sub(r'[…] ?see more', '', text, flags=re.I)
 
     # remove urls
     text = re.sub(r'http:?\S+|www.\S+', '', text)
