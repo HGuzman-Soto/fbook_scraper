@@ -71,6 +71,7 @@ if __name__ == "__main__":
         wikipedia_test_data.name = 'Wikipedia'
         wikipedia_training_data.name = 'Wikipedia'
         test_frames += wikipedia_test_data
+        get_features(wikipedia_training_data, "wikipedia")
 
     if (args.wikinews == 1):
         wiki_test_data = pd.read_pickle('features/WikiNews_Test_allInfo')
@@ -78,6 +79,7 @@ if __name__ == "__main__":
         wiki_test_data.name = 'WikiNews'
         wiki_training_data.name = 'WikiNews'
         test_frames += wiki_training_data
+        get_features(wiki_training_data, "wikiNews")
 
     if (args.news == 1):
         news_test_data = pd.read_pickle('features/News_Test_allInfo')
@@ -85,10 +87,12 @@ if __name__ == "__main__":
         news_test_data.name = 'News'
         news_training_data.name = 'News'
         test_frames += news_test_data
+        get_features(news_training_data, "news")
 
     elif (args.test == 1):
         testing_data = pd.read_pickle('features/testing_data_allInfo')
         testing_data.name = 'testing'
+        test_df = get_features(testing_data, "test")
         test_frames = [testing_data]
 
     # I think this lexicon is in reference to the 2017 wu paper?
@@ -313,10 +317,6 @@ def apply_algorithm(array):
 
         test_data = x
         test_targets = test_data['complex_binary'].values
-        print(test_data)
-        df = pd.DataFrame(data=test_data)
-        df.to_csv('training_features.csv', index=False)
-
         test_predictions = pipeline.predict(test_data)
 
         accuracy = accuracy_score(test_targets, test_predictions)
@@ -331,13 +331,11 @@ def apply_algorithm(array):
 ##########################################################################################################
 
 
-def fbook(fbook_data):
+def fbook(fbook_data, features_df):
     test_predictions = pipeline.predict(fbook_data)
-    print(test_predictions)
-    print(type(test_predictions))
-
-    df = pd.DataFrame(data=test_predictions)
-    df.to_csv('testing_outputs.csv', index=False)
+    outputs_df = pd.DataFrame(data=test_predictions)
+    final_df = features_df.concat(outputs_df)
+    final_df.to_csv('testing_results.csv', index=False)
 
 ##########################################################################################################
 
@@ -345,7 +343,8 @@ def fbook(fbook_data):
 apply_algorithm([total_test])  # with lexicon
 print(model_stats)
 
-
+if (args.test == 1):
+    fbook(total_training, test_df)
 ##########################################################################################################
 
 """
@@ -359,7 +358,8 @@ def get_features(data, name):
     df.drop(columns=['parse', 'count', 'split', 'original_phrase',
                      'total_native', 'total_non_native', 'native_complex', 'non_native_complex',
                      'complex_binary', 'complex_probabilistic'])
-    df.to_csv(name + '_features.csv', index=False)
+    df.to_csv('features/' + name + '_features.csv', index=False)
+    return df
 
 
 ##########################################################################################################
