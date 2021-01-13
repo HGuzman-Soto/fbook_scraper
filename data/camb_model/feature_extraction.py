@@ -4,28 +4,46 @@ import pandas as pd
 import numpy
 import string
 import regex as re
+import argparse
 
 
 # Load the data set that needs populating
 ##########################################################################################################
 
 """
-Fix the way things input later: I'll add in parser options to give user options for
-which datasets they want to extract features from
+
+And then, reorganize code so its not like a jupyter notebook
 
 """
-# Wikinews = True
 
-# array = ['WikiNews_Train', 'WikiNews_Test', 'News_Train',
-#          'News_Test', 'Wikipedia_Train', 'Wikipedia_Test']
-array = ['WikiNews_Train', 'WikiNews_Test']
 
-# array = ['testing_data.tsv']
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Run feature extraction')
+    parser.add_argument('--all', '-a', type=int, default=0)
+    parser.add_argument('--wikipedia', '-w', type=int, default=0)
+    parser.add_argument('--wikinews', '-i', type=int, default=0)
+    parser.add_argument('--news', '-n', type=int, default=0)
+    parser.add_argument('--test', '-t', type=int, default=0)
 
+    array = []
+    args = parser.parse_args()
+    if (args.all == 1):
+        array = ['WikiNews_Train', 'WikiNews_Test', 'News_Train',
+                 'News_Test', 'Wikipedia_Train', 'Wikipedia_Test']
+    elif (args.wikipedia == 1):
+        array += ['Wikipedia_Train', 'Wikipedia_Test']
+    elif (args.wikinews == 1):
+        array += 'WikiNews_Train', 'WikiNews_Test'
+    elif (args.news == 1):
+        array += 'News_Train', 'News_Test'
+    elif (args.test == 1):
+        array = ['testing_data.tsv']
+
+##########################################################################################################
 
 for x in array:
 
-    location = 'actual-test-sets/'+x+'.tsv'
+    location = 'training_data/'+x+'.tsv'
     data_frame = pd.read_table(location, names=('ID', 'sentence', 'start_index', 'end_index', 'phrase', 'total_native',
                                                 'total_non_native', 'native_complex', 'non_native_complex', 'complex_binary', 'complex_probabilistic'))
 
