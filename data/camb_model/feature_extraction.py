@@ -118,7 +118,7 @@ for x in array:
 
     sentences = data_frame[['sentence', 'ID']].copy()
 
-    # sentences = sentences.drop_duplicates()
+    sentences = sentences.drop_duplicates()
 
     print("end core")
 
@@ -207,8 +207,9 @@ for x in array:
                     print("proper dp", number)
                 except:
                     pass
+                return number
         except:
-            pass
+            return 0
 
 
 ##########################################################################################################
@@ -608,7 +609,7 @@ for x in array:
     # # Apply function to get the level from Cambridge Advanced Learner Dictionary
     cald = pd.read_csv('binary-features/CALD.csv')
     word_parse_features['cald'] = word_parse_features['phrase'].apply(
-        lambda x: cald.Level if any(cald.Level == x) else 0)
+        lambda x: cald.Level if x in cald.Word else 0)
 
 ##########################################################################################################
     mrc_features = pd.read_csv('corpus/MRC.csv')
