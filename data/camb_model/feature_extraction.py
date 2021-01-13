@@ -7,19 +7,27 @@ import regex as re
 
 
 # Load the data set that needs populating
-# wikinews done, News_test_complete, Wikipedia_Test_complete, Wikipedia_Train
 ##########################################################################################################
 
-Wikinews = True
+"""
+Fix the way things input later: I'll add in parser options to give user options for
+which datasets they want to extract features from
 
-# array = ['WikiNews_Train', 'WikiNews_Test', 'test_data.tsv']
-array = ['test_data.tsv']
+"""
+# Wikinews = True
+
+# array = ['WikiNews_Train', 'WikiNews_Test', 'News_Train',
+#          'News_Test', 'Wikipedia_Train', 'Wikipedia_Test']
+array = ['WikiNews_Train', 'WikiNews_Test']
+
+# array = ['testing_data.tsv']
+
 
 for x in array:
 
-    # location = 'actual-test-sets/'+x+'.tsv'
-    data_frame = pd.read_table(x, names=('ID', 'sentence', 'start_index', 'end_index', 'phrase', 'total_native',
-                                         'total_non_native', 'native_complex', 'non_native_complex', 'complex_binary', 'complex_probabilistic'))
+    location = 'actual-test-sets/'+x+'.tsv'
+    data_frame = pd.read_table(location, names=('ID', 'sentence', 'start_index', 'end_index', 'phrase', 'total_native',
+                                                'total_non_native', 'native_complex', 'non_native_complex', 'complex_binary', 'complex_probabilistic'))
 
     data_frame['split'] = data_frame['phrase'].apply(lambda x: x.split())
 
@@ -83,7 +91,6 @@ for x in array:
 
 
 ##########################################################################################################
-    # TODO - Set up this
     # Now parse
     import pycorenlp
     import pandas as pd
@@ -93,7 +100,7 @@ for x in array:
 
     sentences = data_frame[['sentence', 'ID']].copy()
 
-    sentences = sentences.drop_duplicates()
+    # sentences = sentences.drop_duplicates()
 
     print("end core")
 
@@ -104,7 +111,7 @@ for x in array:
         x = x.split(' ', 1)[1]
         return x
 
-    if Wikinews:
+    if 'WikiNews' in x:
         sentences['clean sentence'] = sentences['sentence'].apply(
             lambda x: removefirsttoken(x))
 
@@ -127,6 +134,8 @@ for x in array:
     # apply parsing to sentences
     sentences['parse'] = sentences['clean sentence'].apply(lambda x: parse(x))
 
+    print(len(sentences))
+    print(sentences)
     # Merge
     word_parse_features = pd.merge(sentences, word_features)
 
@@ -135,27 +144,27 @@ for x in array:
 
 #     # Work out POS and dep number for words in word_parse_features
 
+    # Issue - There are some inputs that don't work and thats why I added 'NN' as the except
     def get_pos(row):
         word = row['phrase']
         parse = row['parse']
 
         print("word", word)
-        print("parse", parse)
 
         try:
-
-            # print("check", parse['sentences'][0]['tokens'])
             for i in range(len(parse['sentences'][0]['tokens'])):
+                try:
+                    comp_word = parse['sentences'][0]['tokens'][i]['word']
+                    comp_word = comp_word.lower()
+                    comp_word = comp_word.translate(
+                        {ord(char): None for char in remove})
 
-                comp_word = parse['sentences'][0]['tokens'][i]['word']
-                comp_word = comp_word.lower()
-                comp_word = comp_word.translate(
-                    {ord(char): None for char in remove})
-
-                if comp_word == word:
-                    print("proper", parse['sentences'][0]['tokens'][i]['pos'])
-                    print(type(parse['sentences'][0]['tokens'][i]['pos']))
-                    return parse['sentences'][0]['tokens'][i]['pos']
+                    if comp_word == word:
+                        print("proper", parse['sentences']
+                              [0]['tokens'][i]['pos'])
+                        return parse['sentences'][0]['tokens'][i]['pos']
+                except:
+                    return "NN"
         except:
             return "NN"
 
@@ -165,21 +174,23 @@ for x in array:
         number = 0
         word = row['phrase']
         parse = row['parse']
-
         try:
             for i in range(len(parse['sentences'][0]['basicDependencies'])):
-                comp_word = parse['sentences'][0]['basicDependencies'][i]['governorGloss']
-                comp_word = comp_word.lower()
-                comp_word = comp_word.translate(
-                    {ord(char): None for char in remove})
+                try:
+                    comp_word = parse['sentences'][0]['basicDependencies'][i]['governorGloss']
+                    print("word", word)
+                    comp_word = comp_word.lower()
+                    comp_word = comp_word.translate(
+                        {ord(char): None for char in remove})
+                    print("comp word:", comp_word)
 
-                if comp_word == word:
-                    number += 1
-                print("proper dp", number)
-                return number
-
+                    if comp_word == word.lower():
+                        number += 1
+                    print("proper dp", number)
+                except:
+                    pass
         except:
-            return 0
+            pass
 
 
 ##########################################################################################################
@@ -228,18 +239,14 @@ for x in array:
     print("finish lemmatizing", "\n")
 ##########################################################################################################
 
-    # return MRC scores
-    # mrc_features = pd.read_table('corpus/MRC.tsv', names=('word', 'AOA', 'BFRQ', 'CNC',
-    #                                                       'KFCAT', 'FAM', 'KFSMP', 'IMG', 'KFFRQ', 'NLET', 'CMEAN', 'PMEAN', 'NPHN', 'T-LFRQ'))
+    mrc_features = pd.read_csv('corpus/MRC.csv')
 
-    mrc_features = pd.read_table('corpus/MRC.csv', names=('id', 'NPHN', 'KFFRQ',
-                                                          'KFCAT', 'KFSMP', 'T-LFRQ', 'FAM', 'CNC', 'IMG', 'AOA', 'word'))
 ##########################################################################################################
 
     def aoa(word):
         word = ''.join(word.split()).lower()
         try:
-            df = mrc_features.loc[mrc_features['word'] == word]
+            df = mrc_features.loc[mrc_features['word'] == word.upper()]
             fvalue = df.iloc[0]['AOA']
             return fvalue
         except:
@@ -249,7 +256,7 @@ for x in array:
     def cnc(word):
         word = ''.join(word.split()).lower()
         try:
-            df = mrc_features.loc[mrc_features['word'] == word]
+            df = mrc_features.loc[mrc_features['word'] == word.upper()]
             fvalue = df.iloc[0]['CNC']
             return fvalue
         except:
@@ -260,7 +267,7 @@ for x in array:
     def fam(word):
         word = ''.join(word.split()).lower()
         try:
-            df = mrc_features.loc[mrc_features['word'] == word]
+            df = mrc_features.loc[mrc_features['word'] == word.upper()]
             fvalue = df.iloc[0]['FAM']
             return fvalue
         except:
@@ -271,7 +278,7 @@ for x in array:
     def img(word):
         word = ''.join(word.split()).lower()
         try:
-            df = mrc_features.loc[mrc_features['word'] == word]
+            df = mrc_features.loc[mrc_features['word'] == word.upper()]
             fvalue = df.iloc[0]['IMG']
             return fvalue
         except:
@@ -282,7 +289,7 @@ for x in array:
     def phon(word):
         word = ''.join(word.split()).lower()
         try:
-            df = mrc_features.loc[mrc_features['word'] == word]
+            df = mrc_features.loc[mrc_features['word'] == word.upper()]
             fvalue = df.iloc[0]['NPHN']
             return fvalue
         except:
@@ -350,11 +357,11 @@ for x in array:
 
 ##########################################################################################################
 
-    # CNC, KFCAT, FAM, KFSMP, KFFRQ, NLET, NPHN, T-LFRQ
+    # CNC, KFCAT, FAM, KFSMP, KFFRQ, NPHN, T-LFRQ
 
     def CNC_fun(word):
 
-        table = mrc_features[mrc_features['word'] == word]
+        table = mrc_features[mrc_features['word'] == word.upper()]
 
         if len(table) > 0:
 
@@ -366,11 +373,13 @@ for x in array:
             y = 0
             return y
 
+
 ##########################################################################################################
+
 
     def KFCAT_fun(word):
 
-        table = mrc_features[mrc_features['word'] == word]
+        table = mrc_features[mrc_features['word'] == word.upper()]
 
         if len(table) > 0:
 
@@ -386,7 +395,7 @@ for x in array:
 
     def FAM_fun(word):
 
-        table = mrc_features[mrc_features['word'] == word]
+        table = mrc_features[mrc_features['word'] == word.upper()]
 
         if len(table) > 0:
 
@@ -398,11 +407,13 @@ for x in array:
             y = 0
             return y
 
+
 ##########################################################################################################
+
 
     def KFSMP_fun(word):
 
-        table = mrc_features[mrc_features['word'] == word]
+        table = mrc_features[mrc_features['word'] == word.upper()]
 
         if len(table) > 0:
 
@@ -418,7 +429,7 @@ for x in array:
 
     def KFFRQ_fun(word):
 
-        table = mrc_features[mrc_features['word'] == word]
+        table = mrc_features[mrc_features['word'] == word.upper()]
 
         if len(table) > 0:
 
@@ -432,24 +443,9 @@ for x in array:
 
 ##########################################################################################################
 
-    # def NLET_fun(word):
-
-    #     table = mrc_features[mrc_features['word'] == word]
-    #     if len(table) > 0:
-
-    #         NLET = table['NLET'].values[0]
-    #         NLET = int(NLET)
-
-    #         return NLET
-    #     else:
-    #         y = 0
-    #         return y
-
-##########################################################################################################
-
     def NPHN_fun(word):
 
-        table = mrc_features[mrc_features['word'] == word]
+        table = mrc_features[mrc_features['word'] == word.upper()]
         if len(table) > 0:
 
             NPHN = table['NPHN'].values[0]
@@ -464,7 +460,7 @@ for x in array:
 
     def TLFRQ_fun(word):
 
-        table = mrc_features[mrc_features['word'] == word]
+        table = mrc_features[mrc_features['word'] == word.upper()]
         if len(table) > 0:
 
             TLFRQ = table['T-LFRQ'].values[0]
@@ -519,6 +515,7 @@ for x in array:
     def get_frequency(row):
         nofreq = float(0.000000)
         word = row["phrase"]
+        print("word:", word)
         word = str(word)
         tag = row["pos"]
         tag = penn_to_google(tag)
@@ -532,6 +529,7 @@ for x in array:
             frequency = float(frequency)
 
             if tag in tag_list:
+                print("frequency:", frequency)
                 return frequency
             else:
                 lemma = row['lemma']
@@ -544,8 +542,10 @@ for x in array:
                     frequency = float(frequency)
 
                     if tag in tag_list:
+                        print("frequency:", frequency)
                         return frequency
                     else:
+                        print("nofreq")
                         return nofreq
                 except:
                     return nofreq
@@ -614,25 +614,23 @@ for x in array:
     #     lambda x: 1 if any(cald.a == x) else 0)
 
 ##########################################################################################################
-    # TODO - Trying to track down a complete version of this database
-    # Get some MRC features
-    # mrc_features = pd.read_table('corpus/MRC.tsv', names=('word', 'AOA', 'BFRQ', 'CNC',
-    #                                                       'KFCAT', 'FAM', 'KFSMP', 'IMG', 'KFFRQ', 'NLET', 'CMEAN', 'PMEAN', 'NPHN', 'T-LFRQ'))
+    mrc_features = pd.read_csv('corpus/MRC.csv')
 
-    mrc_features = pd.read_table('corpus/MRC.csv', names=('id', 'NPHN', 'KFFRQ',
-                                                          'KFCAT', 'KFSMP', 'T-LFRQ', 'FAM', 'CNC', 'IMG', 'AOA', 'word'))
     print("get mrc cnc and img")
     word_parse_features['cnc'] = word_parse_features['lemma'].apply(
         lambda x: cnc(x))
     word_parse_features['img'] = word_parse_features['lemma'].apply(
         lambda x: img(x))
+    word_parse_features['aoa'] = word_parse_features['lemma'].apply(
+        lambda x: aoa(x))
+    word_parse_features['phon'] = word_parse_features['lemma'].apply(
+        lambda x: phon(x))
 
     print("end mrc cnc and img")
 
 
 ##########################################################################################################
 
-    # subimdb_500 = pd.read_pickle('binary-features/subimdb_500')
     subimdb_500 = pd.read_csv('binary-features/subimbd_500.csv')
     print("get subimbd")
     word_parse_features['sub_imdb'] = word_parse_features['lemma'].apply(
@@ -667,8 +665,6 @@ for x in array:
         lambda x: KFSMP_fun(x))
     word_parse_features['KFFRQ'] = word_parse_features['lemma'].apply(
         lambda x: KFFRQ_fun(x))
-    # word_parse_features['NLET'] = word_parse_features['lemma'].apply(
-    #     lambda x: NLET_fun(x))
     word_parse_features['NPHN'] = word_parse_features['lemma'].apply(
         lambda x: NPHN_fun(x))
     word_parse_features['TLFRQ'] = word_parse_features['lemma'].apply(
@@ -678,6 +674,6 @@ for x in array:
 
 ##########################################################################################################
 
-    word_parse_features.to_pickle('final_run/'+x+'_actual')
+    word_parse_features.to_pickle('features/'+x+'_allInfo')
 
     print(x)

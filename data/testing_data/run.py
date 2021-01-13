@@ -19,6 +19,7 @@ nCores = cpu_count()
 start_time = time.time()
 # df = dd.read_csv('temp_data.csv')
 df = pd.read_csv('temp_data.csv')
+
 # df = df[1000:1500]
 
 """todo
@@ -41,6 +42,7 @@ df = df[df.clean_text.apply(lambda x: isValuableComment(x)) == True]
 meta = ('content_word', 'object')
 
 
+
 # convert to dask dataframe and call extract_content_words()
 df = dd.from_pandas(df, npartitions=12)
 df['content_word'] = df.map_partitions(lambda df: df.clean_text.apply(
@@ -59,6 +61,7 @@ df = df.explode('content_word')
 print("Attaching indexes to each content words \n")
 df[['starting_index', 'ending_index']] = df.apply(lambda x: find_index_cw(
     x.clean_text, x.content_word), axis=1)
+
 
 # df.to_csv('data.csv', index=False)
 print("Finished")

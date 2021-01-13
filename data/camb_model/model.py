@@ -1,5 +1,5 @@
 # adapted from: https://github.com/siangooding/cwi_2018/blob/master/Algorithm%20Application.ipynb
-
+##########################################################################################################
 
 from sklearn.naive_bayes import GaussianNB
 import scipy.stats as stats
@@ -17,40 +17,40 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.base import BaseEstimator, TransformerMixin
 import string
 import numpy as np
-
-# import feature frames
-
 import pandas as pd
 import sys
 
+##########################################################################################################
 
-# x = 'Wikipedia'
+x = 'Wikipedia'
 
-# # wikipedia_test_data = pd.read_pickle('pickled-dataframes/'+x+'_test_data')
-# # wikipedia_training_data = pd.read_pickle(
-# #     'pickled-dataframes/'+x+'_training_data')
-# wikipedia_test_data = pd.read_csv('actual-test-sets/'+x+'_Test.tsv')
-# wikipedia_training_data = pd.read_pickle(
-#     'actual-test-sets/'+x+'_Train.tsv')
-# wikipedia_test_data.name = x
-# wikipedia_training_data.name = x
+wikipedia_test_data = pd.read_pickle('features/Wikipedia_Test_allInfo')
+wikipedia_training_data = pd.read_pickle('features/Wikipedia_Train_allInfo')
+wikipedia_test_data.name = x
+wikipedia_training_data.name = x
 
-# x = 'News'
+x = 'News'
 
-# news_test_data = pd.read_pickle('pickled-dataframes/'+x+'_test_data')
-# news_training_data = pd.read_pickle('pickled-dataframes/'+x+'_training_data')
-# news_test_data.name = 'News'
-# news_training_data.name = 'News'
+news_test_data = pd.read_pickle('features/News_Test_allInfo')
+news_training_data = pd.read_pickle('features/News_Train_allInfo')
+news_test_data.name = 'News'
+news_training_data.name = 'News'
 
 x = 'WikiNews'
 
-wiki_test_data = pd.read_pickle('final_run/WikiNews_Test_actual')
-wiki_training_data = pd.read_pickle('final_run/WikiNews_Train_actual')
+wiki_test_data = pd.read_pickle('features/WikiNews_Test_allInfo')
+wiki_training_data = pd.read_pickle('features/WikiNews_Train_allInfo')
 wiki_test_data.name = x
 wiki_training_data.name = x
+
+
+# I think this lexicon is in reference to the 2017 wu paper?
+# Or their may be a part that has to do with phrases here
 # lexicon = pd.read_table('lexicon', delim_whitespace=True,
 #                         names=('phrase', 'score'))
 # lexicon['phrase'] = lexicon['phrase'].apply(lambda x: str(x).lower())
+
+##########################################################################################################
 
 
 class TextSelector(BaseEstimator, TransformerMixin):
@@ -68,6 +68,8 @@ class TextSelector(BaseEstimator, TransformerMixin):
     def transform(self, X):
         return X[self.key]
 
+##########################################################################################################
+
 
 class NumberSelector(BaseEstimator, TransformerMixin):
     """
@@ -83,6 +85,8 @@ class NumberSelector(BaseEstimator, TransformerMixin):
 
     def transform(self, X):
         return X[[self.key]]
+
+##########################################################################################################
 
 
 first_fixation = Pipeline([
@@ -140,10 +144,7 @@ ogden = Pipeline([
     ('selector', NumberSelector(key='ogden')),
     ('standard', StandardScaler())
 ])
-origin = Pipeline([
-    ('selector', TextSelector(key='origin')),
-    ('vect', CountVectorizer())
-])
+
 
 frequency = Pipeline([
     ('selector', NumberSelector(key='google frequency')),
@@ -155,10 +156,10 @@ subimdb = Pipeline([
     ('standard', StandardScaler())
 ])
 
-n_gram_freq = Pipeline([
-    ('selector', NumberSelector(key='ngram freq')),
-    ('standard', StandardScaler())
-])
+# n_gram_freq = Pipeline([
+#     ('selector', NumberSelector(key='ngram freq')),
+#     ('standard', StandardScaler())
+# ])
 
 # cald = Pipeline([
 #                 ('selector', NumberSelector(key='cald')),
@@ -166,32 +167,33 @@ n_gram_freq = Pipeline([
 #                 ])
 
 
-# aoa = Pipeline([
-#     ('selector', NumberSelector(key='aoa')),
-#     ('standard', StandardScaler())
-# ])
-# conc = Pipeline([
-#                 ('selector', NumberSelector(key='conc')),
-#                 ('standard', StandardScaler())
-#                 ])
-# fam = Pipeline([
-#     ('selector', NumberSelector(key='fam')),
-#     ('standard', StandardScaler())
-# ])
+aoa = Pipeline([
+    ('selector', NumberSelector(key='aoa')),
+    ('standard', StandardScaler())
+])
+conc = Pipeline([
+                ('selector', NumberSelector(key='cnc')),
+                ('standard', StandardScaler())
+                ])
+fam = Pipeline([
+    ('selector', NumberSelector(key='FAM')),
+    ('standard', StandardScaler())
+])
 img = Pipeline([
     ('selector', NumberSelector(key='img')),
     ('standard', StandardScaler())
 ])
-# phon = Pipeline([
-#                 ('selector', NumberSelector(key='phon')),
-#                 ('standard', StandardScaler())
-#                 ])
+phon = Pipeline([
+                ('selector', NumberSelector(key='phon')),
+                ('standard', StandardScaler())
+                ])
 
 # score = Pipeline([
 #     ('selector', NumberSelector(key='score')),
 #     ('standard', StandardScaler())
 # ])
 
+##########################################################################################################
 
 global feats
 feats = FeatureUnion([  # ('ff',first_fixation),
@@ -208,15 +210,17 @@ feats = FeatureUnion([  # ('ff',first_fixation),
     #('origin', origin),
     ('freq', frequency),
     ('subimdb', subimdb),
-    # ('n_gram_freq',n_gram_freq),
+    # ('n_gram_freq', n_gram_freq),
     # ('cald', cald),
-    # ('aoa', aoa),
-    # ('conc', conc),
-    # ('fam', fam),
+    ('aoa', aoa),
+    ('cnc', conc),
+    ('FAM', fam),
     ('img', img),
-    # ('phon', phon),
+    ('phon', phon),
     # ('score', score)
 ])
+
+##########################################################################################################
 
 # frames = [news_training_data, wikipedia_training_data, wiki_training_data]
 frames = [wiki_training_data]
@@ -235,8 +239,14 @@ total_test = pd.concat(frames)
 training_data = total_training
 train_targets = training_data['complex_binary'].values
 
+##########################################################################################################
+
+
 feature_processing = Pipeline([('feats', feats)])
 feature_processing.fit_transform(training_data)
+
+##########################################################################################################
+
 
 model = AdaBoostClassifier(n_estimators=5000, random_state=67)
 pipeline = Pipeline([
@@ -246,6 +256,7 @@ pipeline = Pipeline([
 
 pipeline.fit(training_data, train_targets)
 
+##########################################################################################################
 
 global model_stats
 model_stats = pd.DataFrame(
@@ -261,7 +272,7 @@ def apply_algorithm(array):
         test_targets = test_data['complex_binary'].values
         print(test_data)
         df = pd.DataFrame(data=test_data)
-        df.to_csv('work.csv', index=False)
+        df.to_csv('training_features.csv', index=False)
 
         test_predictions = pipeline.predict(test_data)
 
@@ -274,6 +285,8 @@ def apply_algorithm(array):
             :100], precision, recall, F_Score]
         # baseline_accuracies(test_targets)
 
+##########################################################################################################
+
 
 def fbook(fbook_data):
     test_predictions = pipeline.predict(fbook_data)
@@ -281,17 +294,38 @@ def fbook(fbook_data):
     print(type(test_predictions))
 
     df = pd.DataFrame(data=test_predictions)
-    df.to_csv('mock.csv', index=False)
+    df.to_csv('testing_outputs.csv', index=False)
+
+##########################################################################################################
 
 
 apply_algorithm([total_test])  # with lexicon
 print(model_stats)
 
 
-fbook_data = pd.read_pickle('final_run/test_data')
-fbook_data.to_csv('another.csv', index=False)
-print(fbook_data.head())
-fbook(fbook_data)
+##########################################################################################################
+
+"""
+Given a dataset which contains features, and a name, the function outputs features.csv
+
+"""
+
+
+def get_features(data, name):
+    df = pd.DataFrame(data=data)
+    df.drop(columns=['parse', 'count', 'split', 'original_phrase',
+                     'total_native', 'total_non_native', 'native_complex', 'non_native_complex',
+                     'complex_binary', 'complex_probabilistic'])
+    df.to_csv(name + '_features.csv', index=False)
+
+
+##########################################################################################################
+
+
+# fbook_data = pd.read_pickle('features/test_data')
+# fbook_data.to_csv('testing_features.csv', index=False)
+# print(fbook_data.head())
+# fbook(fbook_data)
 
 
 # apply_algorithm([total_test])  # without lexicon
