@@ -92,7 +92,7 @@ def main():
 
     # run sent_tokenize on 'comments' then make indexes for the text as id_3
     df['comments'] = df['comments'].apply(lambda x: sent_tokenize(str(x)))
-    df['id_3'] = df['comments'].apply(lambda x: range(len(x)))
+    df['id_3'] = df['comments'].apply(lambda x: range(1,len(x)+1))
     df_temp = df[['id_3']].copy()
     df = df.explode('comments', ignore_index = True)
     df_temp = df_temp.explode('id_3', ignore_index = True)
