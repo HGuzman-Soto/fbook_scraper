@@ -31,6 +31,7 @@ if __name__ == "__main__":
         array = ['WikiNews_Train', 'WikiNews_Test', 'News_Train',
                  'News_Test', 'Wikipedia_Train', 'Wikipedia_Test']
     if (args.wikipedia == 1):
+        # array += ['Wikipedia_Train', 'Wikipedia_Test']
         array += ['Wikipedia_Train', 'Wikipedia_Test']
     if (args.wikinews == 1):
         array += 'WikiNews_Train', 'WikiNews_Test'
@@ -104,6 +105,7 @@ for x in array:
         lambda x: x.translate({ord(char): None for char in remove}))
 
     word_features = pd.merge(words, word_set)
+    word_features.to_csv('word_features.csv', index=False)
 
     print('Finished getting syllabels', "\n")
 
@@ -119,6 +121,7 @@ for x in array:
     sentences = data_frame[['sentence', 'ID']].copy()
 
     # sentences = sentences.drop_duplicates()
+    sentences.to_csv("sentences.csv", index=False)
 
     print("end core")
 
@@ -152,10 +155,10 @@ for x in array:
     # apply parsing to sentences
     sentences['parse'] = sentences['clean sentence'].apply(lambda x: parse(x))
 
-    print(len(sentences))
-    print(sentences)
     # Merge
     word_parse_features = pd.merge(sentences, word_features)
+    print(len(word_parse_features))
+    word_parse_features.to_csv('word_parse_features.csv', index=False)
 
     print("finish parsing sentence")
 ##########################################################################################################
@@ -358,6 +361,7 @@ for x in array:
 
     # CNC, KFCAT, FAM, KFSMP, KFFRQ, NPHN, T-LFRQ
 
+
     def CNC_fun(word):
 
         table = mrc_features[mrc_features['word'] == word.upper()]
@@ -374,7 +378,6 @@ for x in array:
 
 
 ##########################################################################################################
-
 
     def KFCAT_fun(word):
 
@@ -408,7 +411,6 @@ for x in array:
 
 
 ##########################################################################################################
-
 
     def KFSMP_fun(word):
 
@@ -474,6 +476,7 @@ for x in array:
 ##########################################################################################################
 
     # Convert tree bank tags to ones that are compatible w google
+
 
     def is_noun(tag):
         return tag in ['NN', 'NNS', 'NNP', 'NNPS']
