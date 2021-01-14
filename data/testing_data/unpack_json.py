@@ -84,7 +84,6 @@ def main():
 
     # get number of comments in each line as range(), move them to seperate df and re-add as id_2 (comment indexes)
     #     once comment indexes are exploded.
-
     df['id_2'] = df['comments'].apply(lambda x: range(1,len(x)+1))
     df_temp = df[['id_2']].copy()
     df = df.explode('comments', ignore_index = True)
@@ -118,8 +117,6 @@ def main():
     df_post['id'] = df_post.apply(lambda x: (str(x['id_1']) + "_0_" + str(x['id_3'])), axis=1)
     df_post = df_post.drop(['id_1', 'id_3'], axis=1)
     df_post = df_post.rename(columns={'post': 'text'})
-
-    print(df)
 
     # bring all data together, remove list bracket leftovers, drop duplicates and empty text
     df = df.append(df_post, ignore_index = True)
