@@ -52,6 +52,18 @@ def extract_content_words(text):
                 content_words.append(token)
             else:  # this is for testing
                 print("Removed word:", token.text, "\n")
+
+    #gets indexes for content words
+    indexes = {}
+    for word in content_words:
+        if word.text not in indexes.keys():
+            indexes[word.text] = []
+            for inst in re.finditer(word.text, text):
+                indexes[word.text].append( (inst.start(), inst.end()) )
+    
+    for i in range(len(content_words)):
+        content_words[i] = (content_words[i], indexes[content_words[i].text].pop(0))
+
     print("content words: ", content_words)
     return content_words
 
