@@ -67,62 +67,71 @@ def find_jsonfile():
 def main():
     json_file = get_jsonfile()
 
-    df = pd.read_json(json_file, orient='DataFrame')
-    df['text'] = ""
-    df['id'] = ""
+    # vectorized data operations
 
-    totalrows = 0
-    totalcomments = []  # lists containing all comment threads, all post ids and all posts
-    totalids = []
-    totalcommid = []
-    totalposts = []
-    for row in range(len(df)):
-        dict_id = df['threads'][row]['id']
-        totalids.append(dict_id)
-        dict_commentid = df['threads'][row]['commentid']
-        totalcommid.append(dict_commentid)
-        dict_comments = df['threads'][row]['comments']
-        totalcomments.append(dict_comments)
-        dict_post = df['threads'][row]['post']
-        totalposts.append(dict_post)
+    d = pd.read_json(json_file, orient='DataFrame')
+    df = pd.json_normalize(d['threads'])
 
-    iterator = 0  # variables for adding to the dataframe
-    rownum = 0
-    # needed this because if post is an image, the array will be empty, which throws an error
-    for i in range(0, len(totalposts)):
-        if len(totalposts[i]) == 0:
-            totalposts[i] = ''
+    # drop comment id from df
+    df = df.drop('commentid', axis=1)
 
-    for comment in totalcomments:  # make each comment its own row in the dataframe and add the necessary information to that row
-        addpost = totalposts[iterator]
-        postlist = sent_tokenize(str(addpost))
-        sentcount = 1
-        for item in postlist:
-            df2 = pd.DataFrame({'post': 0, 'text': item, 'id': str(
-                iterator) + "_" + str(0) + "_" + str(sentcount)}, index=[rownum])
-            result2 = df.append(df2)  # append new row to the dataframe
-            df = result2.copy()
-            rownum = rownum + 1
-            sentcount = sentcount + 1
-        commentnum = 1
-        for comm in comment:
-            sentnum = 1
-            commlist = sent_tokenize(comm)
-            for element in commlist:
-                df1 = pd.DataFrame({'post': 0, 'text': element, 'id': str(
-                    iterator) + "_" + str(commentnum) + "_" + str(sentnum)}, index=[rownum])
-                result = df.append(df1)  # append new row to the dataframe
-                df = result.copy()
-                rownum = rownum + 1
-                sentnum = sentnum + 1
-            commentnum = commentnum + 1
-        iterator = iterator + 1
+    # remove post column as seperate df
+    df_post = df[['post']].copy()
+    df = df.drop('post', axis=1)
 
-    # drop duplicate comments
+    # get post index as id_1
+    df['id_1'] = list(df.index.values)
+
+    # get number of comments in each line as range(), move them to seperate df and re-add as id_2 (comment indexes)
+    #     once comment indexes are exploded.
+
+    df['id_2'] = df['comments'].apply(lambda x: range(1,len(x)+1))
+    df_temp = df[['id_2']].copy()
+    df = df.explode('comments', ignore_index = True)
+    df_temp = df_temp.explode('id_2', ignore_index = True)
+    df['id_2'] = df_temp[['id_2']].copy()
+
+    # run sent_tokenize on 'comments' then make indexes for the text as id_3
+    df['comments'] = df['comments'].apply(lambda x: sent_tokenize(str(x)))
+    df['id_3'] = df['comments'].apply(lambda x: range(len(x)))
+    df_temp = df[['id_3']].copy()
+    df = df.explode('comments', ignore_index = True)
+    df_temp = df_temp.explode('id_3', ignore_index = True)
+    df['id_3'] = df_temp[['id_3']].copy()
+
+    # merge id's
+    df['id'] = df.apply(lambda x: (str(x['id_1']) + "_" + str(x['id_2']) + "_" + str(x['id_3'])), axis=1)
+
+    # drop id cols and rename column
+    df = df.drop(['id_1','id_2','id_3'], axis=1)
+    df = df.rename(columns={'comments': 'text'})
+
+    # work on posts, similarly as with comments
+
+    df_post['post'] = df_post['post'].apply(lambda x: sent_tokenize(str(x)))
+    df_post['id_1'] = range(0,len(df_post))
+    df_post["id_3"] = df_post['post'].apply(lambda x: range(len(x)))
+    df_temp = df_post[['id_3']].copy()
+    df_temp = df_temp.explode('id_3', ignore_index = True)
+    df_post = df_post.explode('post', ignore_index = True)
+    df_post['id_3'] = df_temp[['id_3']].copy()
+    df_post['id'] = df_post.apply(lambda x: (str(x['id_1']) + "_0_" + str(x['id_3'])), axis=1)
+    df_post = df_post.drop(['id_1', 'id_3'], axis=1)
+    df_post = df_post.rename(columns={'post': 'text'})
+
+    print(df)
+
+    # bring all data together, remove list bracket leftovers, drop duplicates and empty text
+    df = df.append(df_post, ignore_index = True)
+    df = df.astype(str)
+    df = df[df['text'] != ("" or "nan")]
+    df['text'] = df['text'].apply(lambda x: re.sub(r"\W*\[\"|\W*\[\'|\'\]\W*|\"\]*\W|\]|\[|^\"|\"$", "", x))
     df.drop_duplicates(subset=['text'], keep='last',
-                       inplace=True, ignore_index=True)
-    df.drop(columns=['threads'], axis=1, inplace=True)
-    df.drop(columns=['post'], axis=1, inplace=True)
+                        inplace=True, ignore_index=True)
+    df.reset_index(drop=True, inplace=True)
+
+    # df to csv
+
     if path.exists('temp_data.csv'):
         df.to_csv('temp_data.csv', mode='a', header=False, index=False)
         # ensures that duplicate comments are dropped from csv
