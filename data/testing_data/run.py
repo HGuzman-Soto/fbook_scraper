@@ -54,6 +54,9 @@ df = df.compute()  # dask to pandas again
 df['content_word'] = df.clean_text.apply(
     lambda x: extract_content_words(x))
 
+# remove rows w/ no content words
+df = df[df['content_word'].astype(bool)]
+
 print("\n")
 print("Expanding content word lists \n")
 df = df.explode('content_word')
