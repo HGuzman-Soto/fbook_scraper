@@ -19,7 +19,7 @@ from nltk import word_tokenize
 """
 
 Input: String of text
-Output: A list of content words from the original cleaned text
+Output: A list of content words and their indexes from the original cleaned text
 
 Method extracts content words based on if they are a noun, verb, adjective or adverb
 
@@ -52,50 +52,23 @@ def extract_content_words(text):
                 content_words.append(token)
             else:  # this is for testing
                 print("Removed word:", token.text, "\n")
+
+    #gets indexes for content words, replace \\ with "." for text and cw's
+    re.sub(r'\\', '.', text)
+    indexes = {}
+    for word in content_words:
+        word_tmp = re.sub(r'\\', '.', word.text)
+        if word.text not in indexes.keys():
+            indexes[word_tmp] = []
+        for inst in re.finditer(word_tmp, text):
+            indexes[word_tmp].append( (inst.start(), inst.end()) )
+    
+    #apply indexes to content words (stack type pop operation)
+    for i in range(len(content_words)):
+        content_words[i] = (content_words[i], indexes[re.sub(r'\\', '.', content_words[i].text)].pop(0))
+
     print("content words: ", content_words)
     return content_words
-
-######################################################################################
-
-
-"""
-Input: A string of the cleaned text and a list of a single content word (which are spacy token objects)
-Output: The starting and ending indexes of that content word in tuple form
-(starting_index, ending_index) ---> mapped to a pd.series
-
-example input: ['I like food'], 'food'
-example output: (7, 10) ---> 7, 10
-
-Issues:
-
-1) There are multiple content words, we need to have them be a different column with its own index like in the original data set
-   I'm not sure the best approach here. I've not implemented this yet
-
-2) Duplication errors. For instance, if the same word appears multiple time this will always
-sget the first occurrence
-
-3) Spacy returns a spacy token. So the list of content words are actually spacy token objects. I need to read up on spacy more
-
-Its been stated that this is not an optimal solution (very memory intensive)
-
-
-"""
-
-
-def find_index_cw(clean_text, content_word):
-    if (content_word != content_word or clean_text != clean_text):
-        return pd.Series([math.nan, math.nan])
-    word_tuple = {}
-    content_word_str = str(content_word)
-    match = re.search(content_word_str, clean_text)
-
-    try:
-        indexes = match.span()
-    except:
-        # change to just get rid of this entry
-        return pd.Series([math.nan, math.nan])
-    return pd.Series([int(indexes[0]), int(indexes[1])])
-
 
 ######################################################################################
 """
@@ -167,7 +140,7 @@ def clean(text):
         return text
 
     # remove see more
-    text = re.sub(r' ?\w*?[…] see more', '', text, flags=re.I)
+    text = re.sub(r'\w*[…] ?see more', '', text, flags=re.I)
 
     # remove urls
     text = re.sub(r'http:?\S+|www.\S+', '', text)

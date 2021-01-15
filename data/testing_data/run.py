@@ -8,7 +8,6 @@ from dask import dataframe as dd
 from dask.multiprocessing import get
 from preprocess import clean
 from preprocess import extract_content_words
-from preprocess import find_index_cw
 from preprocess import isValuableComment
 from os import path
 from dask.distributed import Client
@@ -54,14 +53,18 @@ df = df.compute()  # dask to pandas again
 df['content_word'] = df.clean_text.apply(
     lambda x: extract_content_words(x))
 
+# remove rows w/ no content words
+df = df[df['content_word'].astype(bool)]
+
 print("\n")
 print("Expanding content word lists \n")
 df = df.explode('content_word')
 
 print("Attaching indexes to each content words \n")
-df[['starting_index', 'ending_index']] = df.apply(lambda x: find_index_cw(
-    x.clean_text, x.content_word), axis=1)
+df[['starting_index', 'ending_index']] = df.apply(lambda x: (x['content_word'][1][0], x['content_word'][1][1]), axis=1, result_type='expand')
 
+# reformatting content words from set members back to single tokens
+df['content_word'] = df['content_word'].apply(lambda x: x[0])
 
 # df.to_csv('data.csv', index=False)
 print("Finished")
