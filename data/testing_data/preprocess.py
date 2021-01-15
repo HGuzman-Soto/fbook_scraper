@@ -53,17 +53,19 @@ def extract_content_words(text):
             else:  # this is for testing
                 print("Removed word:", token.text, "\n")
 
-    #gets indexes for content words
+    #gets indexes for content words, replace \\ with "." for text and cw's
+    re.sub(r'\\', '.', text)
     indexes = {}
     for word in content_words:
+        word_tmp = re.sub(r'\\', '.', word.text)
         if word.text not in indexes.keys():
-            indexes[word.text] = []
-            for inst in re.finditer(word.text, text):
-                indexes[word.text].append( (inst.start(), inst.end()) )
+            indexes[word_tmp] = []
+        for inst in re.finditer(word_tmp, text):
+            indexes[word_tmp].append( (inst.start(), inst.end()) )
     
     #apply indexes to content words (stack type pop operation)
     for i in range(len(content_words)):
-        content_words[i] = (content_words[i], indexes[content_words[i].text].pop(0))
+        content_words[i] = (content_words[i], indexes[re.sub(r'\\', '.', content_words[i].text)].pop(0))
 
     print("content words: ", content_words)
     return content_words
@@ -138,7 +140,7 @@ def clean(text):
         return text
 
     # remove see more
-    text = re.sub(r'[…] ?see more', '', text, flags=re.I)
+    text = re.sub(r'\w*[…] ?see more', '', text, flags=re.I)
 
     # remove urls
     text = re.sub(r'http:?\S+|www.\S+', '', text)
