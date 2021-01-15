@@ -24,21 +24,6 @@ import sys
 
 ##########################################################################################################
 
-"""
-Given a dataset which contains features, and a name, the function outputs features.csv
-
-"""
-
-
-def get_features(data, name):
-    df = pd.DataFrame(data=data)
-    df = df.drop(columns=['parse', 'count', 'split', 'original phrase',
-                          'total_native', 'total_non_native', 'native_complex', 'non_native_complex',
-                          'complex_binary', 'complex_probabilistic'])
-    df.to_csv('features/' + name + '_features.csv', index=False)
-    return df
-##########################################################################################################
-
 
 """
 Todo
@@ -63,24 +48,18 @@ if __name__ == "__main__":
     test_frames = []
     args = parser.parse_args()
     if (args.all == 1):
-        # wikipedia_test_data = pd.read_pickle('features/Wikipedia_Test_allInfo')
-        # wikipedia_training_data = pd.read_pickle(
-        #     'features/Wikipedia_Train_allInfo')
-        # wikipedia_test_data.name = 'Wikipedia'
-        # wikipedia_training_data.name = 'Wikipedia'
+        wikipedia_training_data = pd.read_pickle(
+            'features/Wikipedia_Train_allInfo')
+        wikipedia_training_data.name = 'Wikipedia'
 
-        wiki_test_data = pd.read_pickle('features/WikiNews_Test_allInfo')
         wiki_training_data = pd.read_pickle('features/WikiNews_Train_allInfo')
-        wiki_test_data.name = 'WikiNews'
         wiki_training_data.name = 'WikiNews'
 
-        # news_test_data = pd.read_pickle('features/News_Test_allInfo')
-        # news_training_data = pd.read_pickle('features/News_Train_allInfo')
-        # news_test_data.name = 'News'
-        # news_training_data.name = 'News'
+        news_training_data = pd.read_pickle('features/News_Train_allInfo')
+        news_training_data.name = 'News'
 
-        # train_frames = [wikipedia_test_data, wiki_test_data, news_test_data]
-        train_frames = [wiki_test_data]
+        train_frames = [wikipedia_training_data,
+                        wiki_training_data, news_training_data]
 
     if (args.wikipedia == 1):
         wikipedia_test_data = pd.read_pickle('features/Wikipedia_Test_allInfo')
@@ -89,7 +68,6 @@ if __name__ == "__main__":
         wikipedia_test_data.name = 'Wikipedia'
         wikipedia_training_data.name = 'Wikipedia'
         test_frames = [wikipedia_test_data]
-        get_features(wikipedia_training_data, "wikipedia")
 
     if (args.wikinews == 1):
         wiki_test_data = pd.read_pickle('features/WikiNews_Test_allInfo')
@@ -97,20 +75,17 @@ if __name__ == "__main__":
         wiki_test_data.name = 'WikiNews'
         wiki_training_data.name = 'WikiNews'
         test_frames = [wiki_test_data]
-        get_features(wiki_training_data, "wikiNews")
 
     if (args.news == 1):
         news_test_data = pd.read_pickle('features/News_Test_allInfo')
         news_training_data = pd.read_pickle('features/News_Train_allInfo')
         news_test_data.name = 'News'
         news_training_data.name = 'News'
-        test_frames += news_test_data
-        get_features(news_training_data, "news")
+        test_frames = [news_test_data]
 
     elif (args.test == 1):
         testing_data = pd.read_pickle('features/testing_data_allInfo')
         testing_data.name = 'testing'
-        test_df = get_features(testing_data, "test")
         test_frames = [testing_data]
 
     # I think this lexicon is in reference to the 2017 wu paper?
@@ -344,6 +319,10 @@ def apply_algorithm(array):
 
         model_stats.loc[len(model_stats)] = [i, (str(model))[
             :100], precision, recall, F_Score]
+        print("Precision:", model_stats.Precision)
+        print("Recall:", model_stats.Recall)
+        print("F-Score:", model_stats['F-Score'])
+
         # baseline_accuracies(test_targets)
 
 ##########################################################################################################

@@ -5,6 +5,7 @@ import numpy
 import string
 import regex as re
 import argparse
+import json
 
 
 # Load the data set that needs populating
@@ -31,8 +32,8 @@ if __name__ == "__main__":
         array = ['WikiNews_Train', 'WikiNews_Test', 'News_Train',
                  'News_Test', 'Wikipedia_Train', 'Wikipedia_Test']
     if (args.wikipedia == 1):
-        # array += ['Wikipedia_Train', 'Wikipedia_Test']
         array += ['Wikipedia_Train', 'Wikipedia_Test']
+        # array += ['Wikipedia_Test']
     if (args.wikinews == 1):
         array += 'WikiNews_Train', 'WikiNews_Test'
     if (args.news == 1):
@@ -105,7 +106,7 @@ for x in array:
         lambda x: x.translate({ord(char): None for char in remove}))
 
     word_features = pd.merge(words, word_set)
-    word_features.to_csv('word_features.csv', index=False)
+    # word_features.to_csv('debugging/word_features.csv', index=False) debugging purposes
 
     print('Finished getting syllabels', "\n")
 
@@ -120,8 +121,7 @@ for x in array:
 
     sentences = data_frame[['sentence', 'ID']].copy()
 
-    # sentences = sentences.drop_duplicates()
-    sentences.to_csv("sentences.csv", index=False)
+    sentences = sentences.drop_duplicates()
 
     print("end core")
 
@@ -139,6 +139,8 @@ for x in array:
     else:
         sentences['clean sentence'] = sentences['sentence']
 
+    # sentences.to_csv("debugging/sentences_noparse.csv", index=False) debugging
+
     print("start end token")
 ##########################################################################################################
 
@@ -155,10 +157,14 @@ for x in array:
     # apply parsing to sentences
     sentences['parse'] = sentences['clean sentence'].apply(lambda x: parse(x))
 
+    # sentences.to_csv("debugging/sentences.csv", index=False) #debugging purposes
+
     # Merge
+    # word_parse_features = pd.merge(sentences, word_features, on=[
+    #                                'ID', 'sentence'], how='left')
     word_parse_features = pd.merge(sentences, word_features)
     print(len(word_parse_features))
-    word_parse_features.to_csv('word_parse_features.csv', index=False)
+    # word_parse_features.to_csv('debugging/word_parse_features.csv', index=False) debugging purposes
 
     print("finish parsing sentence")
 ##########################################################################################################
@@ -361,7 +367,6 @@ for x in array:
 
     # CNC, KFCAT, FAM, KFSMP, KFFRQ, NPHN, T-LFRQ
 
-
     def CNC_fun(word):
 
         table = mrc_features[mrc_features['word'] == word.upper()]
@@ -378,6 +383,7 @@ for x in array:
 
 
 ##########################################################################################################
+
 
     def KFCAT_fun(word):
 
@@ -411,6 +417,7 @@ for x in array:
 
 
 ##########################################################################################################
+
 
     def KFSMP_fun(word):
 
@@ -476,7 +483,6 @@ for x in array:
 ##########################################################################################################
 
     # Convert tree bank tags to ones that are compatible w google
-
 
     def is_noun(tag):
         return tag in ['NN', 'NNS', 'NNP', 'NNPS']
@@ -612,7 +618,8 @@ for x in array:
     # # Apply function to get the level from Cambridge Advanced Learner Dictionary
     cald = pd.read_csv('binary-features/CALD.csv')
     word_parse_features['cald'] = word_parse_features['phrase'].apply(
-        lambda x: cald.Level if x in cald.Word else 0)
+        lambda x: int(cald.loc[cald.Word == x, 'Level'].mean().round(0)) if any(cald.Word == x) else 0)
+
 
 ##########################################################################################################
     mrc_features = pd.read_csv('corpus/MRC.csv')
