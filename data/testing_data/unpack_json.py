@@ -66,10 +66,17 @@ def find_jsonfile():
 
 def main():
     json_file = get_jsonfile()
+    if json_file in 'json_files/':
+        json_file = 'json_files/' + json_file
 
     # vectorized data operations
 
-    d = pd.read_json(json_file, orient='DataFrame')
+        d = pd.read_json(json_file, orient='DataFrame')
+        shutil.move(json_file,
+                    "json_files/")
+    else:
+        d = pd.read_json(json_file, orient='DataFrame')
+
     df = pd.json_normalize(d['threads'])
 
     # drop comment id from df
@@ -84,47 +91,50 @@ def main():
 
     # get number of comments in each line as range(), move them to seperate df and re-add as id_2 (comment indexes)
     #     once comment indexes are exploded.
-    df['id_2'] = df['comments'].apply(lambda x: range(1,len(x)+1))
+    df['id_2'] = df['comments'].apply(lambda x: range(1, len(x)+1))
     df_temp = df[['id_2']].copy()
-    df = df.explode('comments', ignore_index = True)
-    df_temp = df_temp.explode('id_2', ignore_index = True)
+    df = df.explode('comments', ignore_index=True)
+    df_temp = df_temp.explode('id_2', ignore_index=True)
     df['id_2'] = df_temp[['id_2']].copy()
 
     # run sent_tokenize on 'comments' then make indexes for the text as id_3
     df['comments'] = df['comments'].apply(lambda x: sent_tokenize(str(x)))
-    df['id_3'] = df['comments'].apply(lambda x: range(1,len(x)+1))
+    df['id_3'] = df['comments'].apply(lambda x: range(1, len(x)+1))
     df_temp = df[['id_3']].copy()
-    df = df.explode('comments', ignore_index = True)
-    df_temp = df_temp.explode('id_3', ignore_index = True)
+    df = df.explode('comments', ignore_index=True)
+    df_temp = df_temp.explode('id_3', ignore_index=True)
     df['id_3'] = df_temp[['id_3']].copy()
 
     # merge id's
-    df['id'] = df.apply(lambda x: (str(x['id_1']) + "_" + str(x['id_2']) + "_" + str(x['id_3'])), axis=1)
+    df['id'] = df.apply(lambda x: (str(x['id_1']) + "_" +
+                                   str(x['id_2']) + "_" + str(x['id_3'])), axis=1)
 
     # drop id cols and rename column
-    df = df.drop(['id_1','id_2','id_3'], axis=1)
+    df = df.drop(['id_1', 'id_2', 'id_3'], axis=1)
     df = df.rename(columns={'comments': 'text'})
 
     # work on posts, similarly as with comments
 
     df_post['post'] = df_post['post'].apply(lambda x: sent_tokenize(str(x)))
-    df_post['id_1'] = range(0,len(df_post))
+    df_post['id_1'] = range(0, len(df_post))
     df_post["id_3"] = df_post['post'].apply(lambda x: range(len(x)))
     df_temp = df_post[['id_3']].copy()
-    df_temp = df_temp.explode('id_3', ignore_index = True)
-    df_post = df_post.explode('post', ignore_index = True)
+    df_temp = df_temp.explode('id_3', ignore_index=True)
+    df_post = df_post.explode('post', ignore_index=True)
     df_post['id_3'] = df_temp[['id_3']].copy()
-    df_post['id'] = df_post.apply(lambda x: (str(x['id_1']) + "_0_" + str(x['id_3'])), axis=1)
+    df_post['id'] = df_post.apply(lambda x: (
+        str(x['id_1']) + "_0_" + str(x['id_3'])), axis=1)
     df_post = df_post.drop(['id_1', 'id_3'], axis=1)
     df_post = df_post.rename(columns={'post': 'text'})
 
     # bring all data together, remove list bracket leftovers, drop duplicates and empty text
-    df = df.append(df_post, ignore_index = True)
+    df = df.append(df_post, ignore_index=True)
     df = df.astype(str)
     df = df[df['text'] != ("" or "nan")]
-    df['text'] = df['text'].apply(lambda x: re.sub(r"\W*\[\"|\W*\[\'|\'\]\W*|\"\]*\W|\]|\[|^\"|\"$", "", x))
+    df['text'] = df['text'].apply(lambda x: re.sub(
+        r"\W*\[\"|\W*\[\'|\'\]\W*|\"\]*\W|\]|\[|^\"|\"$", "", x))
     df.drop_duplicates(subset=['text'], keep='last',
-                        inplace=True, ignore_index=True)
+                       inplace=True, ignore_index=True)
     df.reset_index(drop=True, inplace=True)
 
     # df to csv
@@ -138,9 +148,6 @@ def main():
         newdf.to_csv('temp_data.csv', index=False)
     else:
         df.to_csv('temp_data.csv', index=False)
-
-    shutil.move(json_file,
-                "json_files/")
 
 
 if __name__ == "__main__":
