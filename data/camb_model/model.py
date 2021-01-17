@@ -28,10 +28,20 @@ import sys
 """
 Todo
 
-1) Think about where/how to save models (wandb)
+1) Think about where/how to save models (wandb + pickle)
 2) Right now parser args not super clean. Basically you've got the option to train on all or whichever you want
 But the options for which your evaluating is not super clear. My assumption (since camb shows performance best with all datasets)
 is that you'll train on all three. So if you choose test, we'll train on all of them
+
+3) Immma add somewhere where the model outputs are saved along with the labels for each dataset
+
+Arguments
+1) You can train on all the datasets with -a 1. Or train a subset with args -tw 1, -ti and -tn 1. You can chain
+these arguements
+
+2) Then, you test on -w 1, -n 1 or -i 1. You currently can't test on all of them (but it be very easy to change the code
+to do that). 
+
 
 """
 
@@ -39,6 +49,9 @@ is that you'll train on all three. So if you choose test, we'll train on all of 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run feature extraction')
     parser.add_argument('--all', '-a', type=int, default=0)
+    parser.add_argument('--train_wikipedia', '-tw', type=int, default=0)
+    parser.add_argument('--train_wikinews', '-ti', type=int, default=0)
+    parser.add_argument('--train_news', '-tn', type=int, default=0)
     parser.add_argument('--wikipedia', '-w', type=int, default=0)
     parser.add_argument('--wikinews', '-i', type=int, default=0)
     parser.add_argument('--news', '-n', type=int, default=0)
@@ -60,6 +73,22 @@ if __name__ == "__main__":
 
         train_frames = [wikipedia_training_data,
                         wiki_training_data, news_training_data]
+
+    if (args.train_wikipedia == 1):
+        wikipedia_training_data = pd.read_pickle(
+            'features/Wikipedia_Train_allInfo')
+        wikipedia_training_data.name = 'Wikipedia'
+        train_frames.append(wikipedia_training_data)
+
+    if (args.train_wikinews == 1):
+        wiki_training_data = pd.read_pickle('features/WikiNews_Train_allInfo')
+        wiki_training_data.name = 'WikiNews'
+        train_frames.append(wiki_training_data)
+
+    if (args.train_news == 1):
+        news_training_data = pd.read_pickle('features/News_Train_allInfo')
+        news_training_data.name = 'News'
+        train_frames.append(news_training_data)
 
     if (args.wikipedia == 1):
         wikipedia_test_data = pd.read_pickle('features/Wikipedia_Test_allInfo')
@@ -220,9 +249,9 @@ subimdb = Pipeline([
 # ])
 
 cald = Pipeline([
-                ('selector', NumberSelector(key='cald')),
-                ('standard', StandardScaler())
-                ])
+    ('selector', NumberSelector(key='cald')),
+    ('standard', StandardScaler())
+])
 
 
 aoa = Pipeline([
@@ -230,9 +259,9 @@ aoa = Pipeline([
     ('standard', StandardScaler())
 ])
 conc = Pipeline([
-                ('selector', NumberSelector(key='cnc')),
-                ('standard', StandardScaler())
-                ])
+    ('selector', NumberSelector(key='cnc')),
+    ('standard', StandardScaler())
+])
 fam = Pipeline([
     ('selector', NumberSelector(key='FAM')),
     ('standard', StandardScaler())
@@ -242,9 +271,9 @@ img = Pipeline([
     ('standard', StandardScaler())
 ])
 phon = Pipeline([
-                ('selector', NumberSelector(key='phon')),
-                ('standard', StandardScaler())
-                ])
+    ('selector', NumberSelector(key='phon')),
+    ('standard', StandardScaler())
+])
 
 # score = Pipeline([
 #     ('selector', NumberSelector(key='score')),
@@ -346,6 +375,11 @@ if (args.test == 1):
 
 ##########################################################################################################
 
+"""
+Below is what is needed to run the model on our generated fbook data
+Ignore for now as we're not working with that at this moment right now
+
+"""
 
 # fbook_data = pd.read_pickle('features/test_data')
 # fbook_data.to_csv('testing_features.csv', index=False)
