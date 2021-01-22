@@ -1,6 +1,6 @@
 import pandas as pd
 import argparse
-
+import pickle
 ##########################################################################################################
 
 """
@@ -12,15 +12,13 @@ Given a dataset which contains features, and a name, the function outputs featur
 def get_features(data, name):
     df = pd.DataFrame(data=data)
     df = df.drop(columns=['parse', 'count', 'split', 'original phrase',
-                          'total_native', 'total_non_native', 'native_complex', 'non_native_complex',
-                          'complex_binary', 'complex_probabilistic'])
-    df.to_csv('features/' + name + '_features.csv', index=False)
+                          'total_native', 'total_non_native', 'native_complex', 'non_native_complex', 'complex_probabilistic'])
+    df.to_csv('features/' + name + '_features.csv',
+              index=False, encoding='utf-8-sig')
     return df
 
 
 ##########################################################################################################
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run feature extraction')
     parser.add_argument('--wikipedia', '-w', type=int, default=0)
