@@ -32,12 +32,11 @@ if __name__ == "__main__":
         array = ['WikiNews_Train', 'WikiNews_Test', 'News_Train',
                  'News_Test', 'Wikipedia_Train', 'Wikipedia_Test']
     if (args.wikipedia == 1):
-        array += ['Wikipedia_Train', 'Wikipedia_Test']
-        # array += ['Wikipedia_Test']
+        array += 'Wikipedia_Test', 'Wikipedia_Train'
     if (args.wikinews == 1):
-        array += 'WikiNews_Train', 'WikiNews_Test'
+        array += 'WikiNews_Test', 'WikiNews_Train'
     if (args.news == 1):
-        array += 'News_Train', 'News_Test'
+        array += 'News_Test', 'News_Train'
     elif (args.test == 1):
         array = ['testing_data.tsv']
 
@@ -47,7 +46,12 @@ for x in array:
 
     location = 'training_data/'+x+'.tsv'
     data_frame = pd.read_table(location, names=('ID', 'sentence', 'start_index', 'end_index', 'phrase', 'total_native',
-                                                'total_non_native', 'native_complex', 'non_native_complex', 'complex_binary', 'complex_probabilistic'))
+                                                'total_non_native', 'native_complex', 'non_native_complex', 'complex_binary', 'complex_probabilistic'), encoding='utf-8-sig')
+
+    data_frame['sentence'] = data_frame['sentence'].apply(
+        lambda x: x.replace("%", "percent"))
+    data_frame['sentence'] = data_frame['sentence'].apply(
+        lambda x: x.replace("’", "'"))
 
     data_frame['split'] = data_frame['phrase'].apply(lambda x: x.split())
 
@@ -68,8 +72,10 @@ for x in array:
     remove = string.punctuation
     remove = remove.replace("-", "")
     remove = remove.replace("'", "")  # don't remove apostraphies
+
     remove = remove + '“'
     remove = remove + '”'
+
     pattern = r"[{}]".format(remove)  # create the pattern
     word_set['phrase'] = word_set['phrase'].apply(
         lambda x: x.translate({ord(char): None for char in remove}))
@@ -106,7 +112,6 @@ for x in array:
         lambda x: x.translate({ord(char): None for char in remove}))
 
     word_features = pd.merge(words, word_set)
-    # word_features.to_csv('debugging/word_features.csv', index=False) debugging purposes
 
     print('Finished getting syllabels', "\n")
 
@@ -162,16 +167,16 @@ for x in array:
     # Merge
     # word_parse_features = pd.merge(sentences, word_features, on=[
     #                                'ID', 'sentence'], how='left')
+
     word_parse_features = pd.merge(sentences, word_features)
     print(len(word_parse_features))
-    # word_parse_features.to_csv('debugging/word_parse_features.csv', index=False) debugging purposes
 
     print("finish parsing sentence")
 ##########################################################################################################
 
 #     # Work out POS and dep number for words in word_parse_features
 
-    # Issue - There are some inputs that don't work and thats why I added 'NN' as the except
+    # # Issue - There are some inputs that don't work and thats why I added 'NN' as the except
     def get_pos(row):
         word = row['phrase']
         parse = row['parse']
@@ -191,9 +196,21 @@ for x in array:
                               [0]['tokens'][i]['pos'])
                         return parse['sentences'][0]['tokens'][i]['pos']
                 except:
-                    return "NN"
+                    pass
         except:
-            return "NN"
+            return None
+    # def get_pos(row):
+    #     word = row['phrase']
+    #     parse = row['parse']
+    #     for i in range(len(parse['sentences'][0]['tokens'])):
+
+    #         comp_word = parse['sentences'][0]['tokens'][i]['word']
+    #         comp_word = comp_word.lower()
+    #         comp_word = comp_word.translate(
+    #             {ord(char): None for char in remove})
+
+    #         if comp_word == word:
+    #             return parse['sentences'][0]['tokens'][i]['pos']
 
 ###########################################################################################################
 
@@ -219,6 +236,21 @@ for x in array:
             return number
         except:
             pass
+
+    # def get_dep(row):
+    #     number = 0
+    #     word = row['phrase']
+    #     parse = row['parse']
+    #     for i in range(len(parse['sentences'][0]['basicDependencies'])):
+    #         comp_word = parse['sentences'][0]['basicDependencies'][i]['governorGloss']
+    #         comp_word = comp_word.lower()
+    #         comp_word = comp_word.translate(
+    #             {ord(char): None for char in remove})
+
+    #         if comp_word == word:
+    #             number += 1
+
+    #     return number
 
 
 ##########################################################################################################
@@ -400,7 +432,7 @@ for x in array:
             return y
 
 ##########################################################################################################
-
+    # get rid?
     def FAM_fun(word):
 
         table = mrc_features[mrc_features['word'] == word.upper()]
@@ -535,6 +567,7 @@ for x in array:
             frequency = word_results[0]['tags'][-1][2:]
 
             frequency = float(frequency)
+            print("nofreq normal:", frequency)
 
             if tag in tag_list:
                 print("frequency_1:", frequency)
@@ -544,15 +577,14 @@ for x in array:
                 try:
                     word_results = api.words(sp=lemma, max=1, md='pf')
                     tag_list = (word_results[0]['tags'][:-1])
-
                     frequency = word_results[0]['tags'][-1][2:]
-
                     frequency = float(frequency)
 
                     if tag in tag_list:
                         print("frequency_2:", frequency)
                         return frequency
                     else:
+                        print("nofreq lemma:", frequency)
                         print("nofreq")
                         return nofreq
                 except:
@@ -631,8 +663,9 @@ for x in array:
         lambda x: img(x))
     word_parse_features['aoa'] = word_parse_features['lemma'].apply(
         lambda x: aoa(x))
-    word_parse_features['phon'] = word_parse_features['lemma'].apply(
-        lambda x: phon(x))
+
+    word_parse_features['fam'] = word_parse_features['lemma'].apply(
+        lambda x: fam(x))
 
     print("end mrc cnc and img")
 
@@ -667,8 +700,8 @@ for x in array:
     print('get rest of mrc')
     word_parse_features['KFCAT'] = word_parse_features['lemma'].apply(
         lambda x: KFCAT_fun(x))
-    word_parse_features['FAM'] = word_parse_features['lemma'].apply(
-        lambda x: FAM_fun(x))
+    # word_parse_features['FAM'] = word_parse_features['lemma'].apply(
+    #     lambda x: FAM_fun(x))
     word_parse_features['KFSMP'] = word_parse_features['lemma'].apply(
         lambda x: KFSMP_fun(x))
     word_parse_features['KFFRQ'] = word_parse_features['lemma'].apply(
@@ -682,6 +715,10 @@ for x in array:
 
 ##########################################################################################################
 
+    word_parse_features['parse'] = word_parse_features.parse.astype(str)
+    word_parse_features['split'] = word_parse_features['split'].astype(str)
+
+    word_parse_features = word_parse_features.drop_duplicates()
     word_parse_features.to_pickle('features/'+x+'_allInfo')
 
     print(x)
