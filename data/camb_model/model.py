@@ -9,6 +9,7 @@ from sklearn.metrics import recall_score
 from sklearn.metrics import accuracy_score
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import VotingClassifier
 from sklearn.pipeline import FeatureUnion
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -20,6 +21,12 @@ import numpy as np
 import argparse
 import pandas as pd
 import sys
+
+
+##########################################################################################################
+# import wandb
+# wandb.init(project="visualize-sklearn")
+# https://docs.wandb.ai/integrations/scikit
 
 
 ##########################################################################################################
@@ -40,7 +47,7 @@ Arguments
 these arguements
 
 2) Then, you test on -w 1, -n 1 or -i 1. You currently can't test on all of them (but it be very easy to change the code
-to do that). 
+to do that).
 
 
 """
@@ -69,6 +76,7 @@ if __name__ == "__main__":
         wiki_training_data.name = 'WikiNews'
 
         news_training_data = pd.read_pickle('features/News_Train_allInfo')
+        news_training_data = news_training_data.drop_duplicates()
         news_training_data.name = 'News'
 
         train_frames = [wikipedia_training_data,
@@ -107,7 +115,6 @@ if __name__ == "__main__":
 
     if (args.news == 1):
         news_test_data = pd.read_pickle('features/News_Test_allInfo')
-        news_training_data = pd.read_pickle('features/News_Train_allInfo')
         news_test_data.name = 'News'
         news_training_data.name = 'News'
         test_frames = [news_test_data]
@@ -263,15 +270,37 @@ conc = Pipeline([
     ('standard', StandardScaler())
 ])
 fam = Pipeline([
-    ('selector', NumberSelector(key='FAM')),
+    ('selector', NumberSelector(key='fam')),
     ('standard', StandardScaler())
 ])
 img = Pipeline([
     ('selector', NumberSelector(key='img')),
     ('standard', StandardScaler())
 ])
-phon = Pipeline([
-    ('selector', NumberSelector(key='phon')),
+
+
+KFCAT = Pipeline([
+    ('selector', NumberSelector(key='KFCAT')),
+    ('standard', StandardScaler())
+])
+
+KFSMP = Pipeline([
+    ('selector', NumberSelector(key='KFSMP')),
+    ('standard', StandardScaler())
+])
+
+KFFRQ = Pipeline([
+    ('selector', NumberSelector(key='KFFRQ')),
+    ('standard', StandardScaler())
+])
+
+NPHN = Pipeline([
+    ('selector', NumberSelector(key='NPHN')),
+    ('standard', StandardScaler())
+])
+
+TLFRQ = Pipeline([
+    ('selector', NumberSelector(key='TLFRQ')),
     ('standard', StandardScaler())
 ])
 
@@ -301,9 +330,13 @@ feats = FeatureUnion([  # ('ff',first_fixation),
     ('cald', cald),
     ('aoa', aoa),
     ('cnc', conc),
-    ('FAM', fam),
+    ('fam', fam),
     ('img', img),
-    ('phon', phon),
+    ('KFCAT', KFCAT),
+    ('KFSMP', KFSMP),
+    ('KFFRQ', KFFRQ),
+    ('NPHN', NPHN),
+    ('TLFRQ', TLFRQ)
     # ('score', score)
 ])
 
@@ -325,6 +358,24 @@ pipeline = Pipeline([
 
 pipeline.fit(training_data, train_targets)
 
+
+"""
+
+Ensemble method - 
+"""
+# rf = RandomForestClassifier(n_estimators=1000)
+
+# pipeline_rf = Pipeline([
+#     ('features', feats),
+#     ('classifier', rf)
+# ])
+# pipeline_rf.fit(training_data, train_targets)
+
+
+# estimators = [('rf', pipeline_rf), ('ada', pipeline)]
+# ensemble = VotingClassifier(estimators, voting='hard')
+# ensemble.fit(training_data, train_targets)
+
 ##########################################################################################################
 
 global model_stats
@@ -339,15 +390,17 @@ def apply_algorithm(array):
 
         test_data = x
         test_targets = test_data['complex_binary'].values
+        # test_predictions = ensemble.predict(test_data)
         test_predictions = pipeline.predict(test_data)
 
         accuracy = accuracy_score(test_targets, test_predictions)
         precision = precision_score(test_targets, test_predictions)
         recall = recall_score(test_targets, test_predictions)
-        F_Score = f1_score(test_targets, test_predictions)
+        F_Score = f1_score(test_targets, test_predictions, average='macro')
 
         model_stats.loc[len(model_stats)] = [i, (str(model))[
             :100], precision, recall, F_Score]
+        print("Accuracy", accuracy)
         print("Precision:", model_stats.Precision)
         print("Recall:", model_stats.Recall)
         print("F-Score:", model_stats['F-Score'])
